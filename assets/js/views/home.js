@@ -1,6 +1,7 @@
 // Landing page: what Sanket is, the four windows and how it works.
 import { esc, icon } from "../ui.js";
 import { ILLUS } from "../illus.js";
+import { photo } from "../photos.js";
 
 const ROLES = [
   { href: "#/patient", icon: "user", art: "patient", title: "Patient", text: "Describe the problem, get a token or 108 advice.", tone: "brand" },
@@ -41,6 +42,16 @@ export function render(root) {
             <span class="r-go">Open ${icon("arrowR")}</span>
           </div>
         </a>`).join("")}
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="sec-head"><h2>Built for India's front doors</h2>
+      <p class="ink2">Sanket sends each request to the right step of the public health ladder.</p></div>
+      <div class="ladder-photos stagger">
+        ${photo("subcentre", { caption: "<b>Sub-centre and ASHA</b><span>Routine needs: vaccines, refills, reports</span>" }).replace("<img", '<span class="step" style="background:var(--rt-tint);color:var(--rt)">Routine</span><img')}
+        ${photo("phc", { caption: "<b>Primary health centre</b><span>Same-day review by the medical officer</span>" }).replace("<img", '<span class="step" style="background:var(--sd-tint);color:var(--sd)">Same-day</span><img')}
+        ${photo("ambulance", { caption: "<b>108 ambulance</b><span>Red flags skip the queue entirely</span>" }).replace("<img", '<span class="step" style="background:var(--em-tint);color:var(--em)">Emergency</span><img')}
       </div>
     </section>
 

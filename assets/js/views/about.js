@@ -4,6 +4,7 @@ import { esc, icon, highlight, evidenceGroups, laneChip, fmtNum, countUp } from 
 import { STATS, SOURCES } from "../india.js";
 import * as charts from "../charts.js";
 import { ILLUS } from "../illus.js";
+import { photo } from "../photos.js";
 
 const DEMO = "Seene mein halka sa dard hai, ghar wale bolte hain gas hai, kuch nahi hai";
 const src = (k) => `<a class="src" href="${SOURCES[k].url}" target="_blank" rel="noopener">${esc(SOURCES[k].label.split(",")[0])}</a>`;
@@ -47,6 +48,7 @@ export function render(root) {
 
     <section class="card" style="margin-top:16px">
       <h2 class="h2i">${icon("chart")}Why it matters in India</h2>
+      ${photo("opd", { w: 1400, cls: "why-photo", caption: "<b>A busy government OPD</b><span>Every request here needs the right lane, fast</span>" })}
       <div class="grid g3 facts stagger" style="margin-top:14px">
         <div class="fact">${icon("hospital")}<strong class="num" data-count="${STATS.specialistGap.value}" data-dec="1" data-suffix="%">0%</strong><span>of specialist posts at rural CHCs were vacant in 2023, so the first desk has to get the lane right.</span><small>${src("hdi")}</small></div>
         <div class="fact">${icon("thermo")}<strong class="num" data-count="${STATS.heat2024.suspected}">0</strong><span>suspected heatstroke cases in summer 2024. “Loo lag gayi” goes to emergency.</span><small>${src("heat")}</small></div>
