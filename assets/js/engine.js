@@ -1,13 +1,13 @@
 /* Sanket routing engine (India edition).
  * Deterministic, rule-based and fully inspectable. It sorts appointment
  * requests into administrative lanes. It never names a condition and never
- * produces a diagnosis. Understands simple English, romanised Hinglish and Hindi in Devanagari.
+ * produces a diagnosis. Understands simple English and romanised Hinglish.
  * Works in the browser (window.TriageEngine) and in Node (module.exports).
  */
 (function (root) {
   "use strict";
 
-  var POLICY_VERSION = "SANKET-POLICY 2.0 India (synthetic demo)";
+  var POLICY_VERSION = "SANKET-POLICY 2.1 India (synthetic demo)";
 
   var CATEGORIES = {
     EMERGENCY: {
@@ -127,7 +127,7 @@
       reason: "The requester sounds unsure or describes something vague.",
       patterns: [/not sure/, /don'?t know (what|why|if)/, /something (is )?(wrong|not right|off)/, /\bweird\b/, /\bstrange\b/, /samajh nahi aa/, /pata nahi/, /kuch theek nahi lag/, /ajeeb/] },
     { id: "F4", category: "SAME_DAY", fallback: true, title: "Script the tool cannot read",
-      reason: "The request is in a script the rules do not read yet (for example Tamil or Bengali), or in Hindi that matched no rule, so a person reads it.",
+      reason: "The request is written in a script the rules do not read (for example Devanagari or Tamil), so a person reads it.",
       field: "unreadableScript" },
     { id: "F5", category: "SAME_DAY", fallback: true, title: "Nothing in the policy matched",
       reason: "No routine reason and no known pattern was found. The safe default is human review, not routine booking.",
@@ -141,44 +141,6 @@
         /blood pressure (check|review|reading)/, /bp (check|reading|dikhana)/, /sugar (check|test|reading)/, /dressing change/, /(dawai|dawa) (refill|likhwani|likhwana)/, /\bmild\b/, /\bminor\b/] }
   ];
 
-  /* Hindi in Devanagari. Text is folded before matching (nukta removed,
-   * chandrabindu read as anusvara), so these patterns are written without
-   * them: "जहर" also matches "ज़हर", "सांस" also matches "साँस". */
-  var HINDI = {
-    E1: [/(सीने|सीना|छाती) (में|पर|मे) (दर्द|भारीपन|भारी|जलन|दबाव)/, /दिल का दौरा/],
-    E2: [/सांस (नहीं|नही) (आ|ले पा)/, /सांस (लेने )?(में|मे) (तकलीफ|दिक्कत|परेशानी)/, /सांस (की|लेने की) (तकलीफ|दिक्कत|परेशानी)/, /सांस फूल/, /दम घुट/],
-    E3: [/लकवा/, /(मुंह|मुह|चेहरा) (टेढा|लटक)/, /(जुबान|जबान|आवाज) (लडखडा|अटक)/, /एक (तरफ|साइड) (सुन्न|कमजोर)/],
-    E4: [/बेहोश/, /होश (नहीं|खो)/],
-    E5: [/दौरा (पड|आ)/, /मिर्गी/, /झटके (आ|लग)/],
-    E6: [/खून (नहीं|नही) रुक/, /बहुत (ज्यादा )?खून/, /खून की उल्टी/, /उल्टी (में|मे) खून/],
-    E7: [/(गला|गले|जीभ|होंठ|होठ) (में |मे )?(सूज|सुज|बंद)/],
-    E8: [/आत्महत्या/, /खुदकुशी/, /मरना चाह/, /मर जाना चाह/, /जीना (नहीं|नही) चाह/, /जान दे (दूंगा|दूंगी|दूँगा|देना)/],
-    E9: [/(जहर|विष) (खा|पी)/, /कीटनाशक/, /कीडे (मारने )?की दवा (पी|खा)/, /(फिनाइल|केरोसिन|तेजाब|एसिड) (पी|खा)/],
-    E10: [/(सांप|साप) (ने )?(काट|डस)/, /(बिच्छू|बिच्छु) (ने )?(काट|डंक)/],
-    E11: [/लू लग/, /सिर (पर|पे) चोट/, /(सडक|बाइक|स्कूटी|गाडी) (दुर्घटना|एक्सीडेंट)/, /(छत|सीढी) से गिर/],
-    S2: [/बुखार/, /ताप/],
-    S3: [/बढ (रहा|रही|गया|गयी|गई|ता)/, /ठीक (नहीं|नही) हो (रहा|रही)/, /आराम (नहीं|नही)/],
-    S4: [/बहुत (तेज |ज्यादा )?दर्द/, /बर्दाश्त (नहीं|नही)/, /सहन (नहीं|नही)/],
-    S5: [/उल्टी/, /दस्त/, /पानी (नहीं|नही) पी/],
-    S6: [/(कुत्ते|कुत्ता|बंदर|बिल्ली|चूहे) (ने )?काट/, /मवाद/],
-    S7: [/गर्भवती/, /पेट से (है|हूं|हूँ)/],
-    S8: [/घबराहट/, /नींद (नहीं|नही) आ/, /बहुत (टेंशन|उदास|परेशान)/],
-    S9: [/दवा(ई|इ)? (खत्म|नहीं मिली)/, /इंसुलिन (खत्म|नहीं)/],
-    S10: [/पेशाब (में|मे) (जलन|खून)/, /गांठ/, /दाने (निकल|हो)/],
-    F3: [/पता (नहीं|नही)/, /समझ (नहीं|नही) आ/, /कुछ ठीक (नहीं|नही) लग/, /अजीब/],
-    R1: [/टीका/, /टीकाकरण/, /(जांच|चेकअप) (करानी|करवानी|कराना|करवाना)/, /रिपोर्ट (दिखा|ले|लेनी)/, /प्रमाण ?पत्र/, /सर्टिफिकेट/, /(बीपी|शुगर) (की )?(जांच|चेक)/, /दवा (लिखवा|दोबारा)/]
-  };
-  var HINDI_ALL = {
-    E12: [/बुखार|डेंगू/, /मसूडों से खून|नाक से खून|काला मल|पेट (में|मे) (बहुत|तेज) दर्द/],
-    E13: [/गर्भवती|पेट से/, /खून|दौरा|धुंधला|तेज सिर ?दर्द|पानी (गिर|निकल)|बच्चा (हिल|हलचल) (नहीं|कम)/]
-  };
-  RULES.forEach(function (rule) {
-    if (HINDI[rule.id]) rule.patterns = (rule.patterns || []).concat(HINDI[rule.id]);
-    if (HINDI_ALL[rule.id]) rule.requiresAll = rule.requiresAll.map(function (re, i) {
-      return new RegExp("(?:" + re.source + ")|(?:" + HINDI_ALL[rule.id][i].source + ")");
-    });
-  });
-
   /* The framing guard. Family members often soften a request ("kuch nahi hai",
    * "ghar wale bolte hain gas hai"). Research shows reassurance like this makes
    * AI triage much less cautious. We score the text a second time with these
@@ -187,15 +149,12 @@
     /kuch (khaas |khas |bhi )?nahi?n? hai/, /koi baat nahi?n?/, /tension (ki|ka) koi baat nahi?n?/, /chinta (ki|ka) koi baat nahi?n?/, /ghabrane (ki|ka) (koi )?baat nahi?n?/,
     /(ghar wale|gharwale|family|mummy|papa|husband|wife|beta|beti) (bol|keh|kah|kehte|bolte|say|says|think|thinks)[a-z ]{0,20}(gas|acidity|thakan|kamzori|nothing|normal|age)( hai| hain| ho)?/,
     /bas (thoda|thodi|halka|halki|gas|acidity)( sa| si)?( hai)?/, /thoda sa/, /thodi si/, /halka sa/, /\bhalka\b/, /normal hai/, /\bjust\b( a)?( little| bit)?/, /\bonly\b( a)?( little| slight)?/,
-    /probably (nothing|just gas|gas|acidity)/, /nothing serious/, /not a big deal/, /no need to worry/, /don'?t worry/, /\bmild\b/, /\bminor\b/, /\bslight\b/, /(might|may) be (just )?(gas|acidity|weakness)/,
-    /कुछ (खास |भी )?(नहीं|नही) है/, /(चिंता|टेंशन|घबराने) (की|का) (कोई )?बात (नहीं|नही)/, /कोई बात (नहीं|नही)/,
-    /(घर वाले|घरवाले|परिवार वाले|पति|पत्नी|बेटा|बेटी) (बोल|कह)[^,।.]{0,24}(गैस|एसिडिटी|थकान|कमजोरी|उम्र)( है| हैं)?/,
-    /बस (थोडा|थोडी|हल्का|हल्की|गैस)( सा| सी)?( है)?/, /थोडा सा/, /थोडी सी/, /हल्का सा/, /हल्की सी/, /नॉर्मल है/
+    /probably (nothing|just gas|gas|acidity)/, /nothing serious/, /not a big deal/, /no need to worry/, /don'?t worry/, /\bmild\b/, /\bminor\b/, /\bslight\b/, /(might|may) be (just )?(gas|acidity|weakness)/
   ];
 
   var NEGATION_BEFORE = /\b(no|not|never|without|denies|don'?t have|doesn'?t have|didn'?t have|isn'?t|no sign of)\s+(any\s+|a\s+)?$/;
-  var NEGATION_AFTER = /^\s*(bilkul\s+|बिल्कुल\s+)?(nahi|nahin|nhi|nai|नहीं|नही)(?![a-z])/;
-  var SYMPTOM_HINT = /(pain|hurt|ache|sore|fever|cough|rash|swell|bleed|vomit|dizz|tired|sick|unwell|breath|headache|nausea|itch|burn|lump|injur|fell|fall|dard|bukhar|bukhaar|khansi|ulti|chakkar|kamzori|sujan|jalan|takleef|taklif|dikkat|दर्द|बुखार|खांसी|उल्टी|चक्कर|कमजोरी|सूजन|जलन|तकलीफ|दिक्कत)/;
+  var NEGATION_AFTER = /^\s*(bilkul\s+)?(nahi|nahin|nhi|nai)(?![a-z])/;
+  var SYMPTOM_HINT = /(pain|hurt|ache|sore|fever|cough|rash|swell|bleed|vomit|dizz|tired|sick|unwell|breath|headache|nausea|itch|burn|lump|injur|fell|fall|dard|bukhar|bukhaar|khansi|ulti|chakkar|kamzori|sujan|jalan|takleef|taklif|dikkat)/;
 
   // Folds one character for matching: lower case, curly quotes, Devanagari
   // nukta dropped and chandrabindu read as anusvara. Returns "" to drop it.
@@ -227,7 +186,7 @@
       while ((m = g.exec(text)) !== null) {
         var before = text.slice(Math.max(0, m.index - 30), m.index);
         var after = text.slice(m.index + m[0].length, m.index + m[0].length + 20);
-        var isNeg = NEGATION_BEFORE.test(before) || NEGATION_AFTER.test(after.replace(/^\s*(hai|ho|hui|aa rahi|aa raha|bhi|है|हो|हुई|भी)(?=\s|$|[^a-z\u0900-\u097f])/, ""));
+        var isNeg = NEGATION_BEFORE.test(before) || NEGATION_AFTER.test(after.replace(/^\s*(hai|ho|hui|aa rahi|aa raha|bhi)\b/, ""));
         (isNeg ? negated : hits).push(m[0]);
         if (m[0].length === 0) g.lastIndex++;
       }
@@ -247,13 +206,13 @@
     meds: { thinners: "Blood thinner", insulin: "Insulin" },
     flags: { repeatVisit: "Came for the same problem in the last 2 weeks", recentAdmission: "Hospital stay or surgery in the last 4 weeks" }
   };
-  var CHEST = /(chest|seene|seena|sine|chhati|chhaati|सीने|सीना|छाती|breath|saans|सांस|sweat|paseen|पसीना|ghabrahat|घबराहट|left arm|baayen haath|बाएं हाथ|jaw|jabde)/;
-  var FEVER = /(fever|bukh?aa?r|\btap\b|temperature|बुखार|ताप|chills|kapkapi|कंपकंपी)/;
-  var BLEED_FALL = /(bleed|blood|khoon|खून|fell|fall|gir (gaya|gayi|pada|padi)|गिर|injur|chot|चोट|bruise|neel|नील|accident)/;
-  var DIAB_WARN = /(vomit|ulti|उल्टी|not eating|khana nahi|खाना नहीं|sugar (is |bahut |very )?(high|zyada|jyada|[3-6]\d\d)|शुगर (बहुत|ज्यादा)|foot|pair (mein|me|par) (ghav|zakhm|chot)|ghav|zakhm|घाव|drows|neend bahut|sust|सुस्त)/;
-  var LUNG_WARN = /(wheez|saans|सांस|breath|inhaler|pump|cough|khansi|खांसी)/;
-  var LUNG_SEVERE = /((inhaler|pump|nebuli[sz]er)[a-z ]{0,20}(not|nahi|no) (help|working|kaam|aaram)|(inhaler|pump) se (bhi )?aaram nahi|पंप से (भी )?आराम नहीं)/;
-  var KIDNEY_WARN = /(swell|sujan|soojan|सूजन|urine (less|kam|band)|peshab (kam|band|nahi)|पेशाब (कम|बंद)|vomit|ulti|उल्टी|yellow|peela|पीला)/;
+  var CHEST = /(chest|seene|seena|sine|chhati|chhaati|breath|saans|sweat|paseen|ghabrahat|left arm|baayen haath|jaw|jabde)/;
+  var FEVER = /(fever|bukh?aa?r|\btap\b|temperature|chills|kapkapi)/;
+  var BLEED_FALL = /(bleed|blood|khoon|fell|fall|gir (gaya|gayi|pada|padi)|injur|chot|bruise|neel|accident)/;
+  var DIAB_WARN = /(vomit|ulti|not eating|khana nahi|sugar (is |bahut |very )?(high|zyada|jyada|[3-6]\d\d)|foot|pair (mein|me|par) (ghav|zakhm|chot)|ghav|zakhm|drows|neend bahut|sust)/;
+  var LUNG_WARN = /(wheez|saans|breath|inhaler|pump|cough|khansi)/;
+  var LUNG_SEVERE = /((inhaler|pump|nebuli[sz]er)[a-z ]{0,20}(not|nahi|no) (help|working|kaam|aaram)|(inhaler|pump) se (bhi )?aaram nahi)/;
+  var KIDNEY_WARN = /(swell|sujan|soojan|urine (less|kam|band)|peshab (kam|band|nahi)|vomit|ulti|yellow|peela)/;
   var HISTORY_RULES = [
     { id: "H1", category: "EMERGENCY", title: "History: heart disease with chest or breathing symptoms",
       reason: "Known heart disease and today's text mentions the chest, breathing, sweating or the left arm. The lane is raised to emergency guidance.",
@@ -322,7 +281,7 @@
     }
 
     var hist = readHistory(request);
-    var scanText = hist.conditions.pregnant && !/(pregnan|garbh|pet se|गर्भ|पेट से)/.test(text) ? "pregnant. " + text : text;
+    var scanText = hist.conditions.pregnant && !/(pregnan|garbh|pet se)/.test(text) ? "pregnant. " + text : text;
     RULES.forEach(function (rule) {
       if (!rule.patterns && !rule.requiresAll) return;
       var s = scan(rule, scanText);
@@ -343,12 +302,8 @@
     var plainEmergency = fired.some(function (f) { return f.category === "EMERGENCY"; });
     if (negatedEvidence.length && !plainEmergency) fire(ruleById("F2"), negatedEvidence);
 
-    // Devanagari Hindi is read by the rules above. Other Indian scripts are
-    // not yet, and Devanagari that matched nothing still goes to a person.
-    var raw = String(request.description || "");
-    var readByRules = fired.some(function (f) { return !f.fallback && /^[ERS]\d/.test(f.ruleId) && f.ruleId !== "S1" && f.ruleId !== "S11" && f.ruleId !== "E14"; });
-    if (/[\u0980-\u0DFF]/.test(raw)) fire(ruleById("F4"), ["Script not yet supported"]);
-    else if (/[\u0900-\u097F]/.test(raw) && !readByRules) fire(ruleById("F4"), ["Hindi text with no rule match"]);
+    // Scripts the rules cannot read (Devanagari, Tamil, Bengali and others) go to a person.
+    if (/[\u0900-\u0DFF]/.test(String(request.description || ""))) fire(ruleById("F4"), ["Non-Latin script"]);
     if (wordCount(text) < 4 && !request.selfEmergency) fire(ruleById("F1"), [wordCount(text) + " word(s)"]);
     if (!fired.length) fire(ruleById("F5"), []);
 

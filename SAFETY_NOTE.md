@@ -17,7 +17,7 @@ An administrative sorting aid for the front desk of a community clinic. It sugge
 ## Safe fallback
 - Routine needs positive evidence. Unclear, very short, unsure or unmatched requests go to same-day human review.
 - A red flag written with a negation ("no chest pain", "saans ki dikkat nahi") is not ruled out by the tool; a person checks it.
-- Hindi in Devanagari is read by the rules. Hindi that matches nothing, and scripts the rules cannot read yet (Tamil, Bengali and others), go to a person.
+- The rules read English and Hinglish. Text in any Indian script (Devanagari, Tamil, Bengali and others) goes to a person.
 - If the AI check fails, a routine result is raised to human review.
 - The framing guard stops reassurance from family members ("ghar wale bolte hain gas hai") from lowering the lane.
 ## People stay in charge
@@ -29,6 +29,6 @@ An administrative sorting aid for the front desk of a community clinic. It sugge
 - Requests are stored only in this browser. The optional AI check sends the request text (with reassurance removed) and age to Claude, with no name.
 ## Known limits
 - Keyword rules miss unusual wording and spelling. The AI check helps, but neither is validated clinically.
-- Hinglish and Hindi coverage is a starter list. Other Indian scripts are not read yet; they fall back to a person.
+- Hinglish coverage is a starter list. Other Indian scripts are not read yet; they fall back to a person.
 - The tests are made up by the team, not taken from real clinic data.
 - Future work: review by a clinician, testing on consented real requests, regional language support, and a check against CDSCO guidance for medical software before any real use.

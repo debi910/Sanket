@@ -93,17 +93,17 @@ export const CLINIC = {
 // into the right one saves the patient a wasted trip. Weekdays are the demo
 // clinic's; PMSMA on the 9th is national.
 export const SERVICES = [
-  { id: "imm", name: "Routine immunisation session", hi: "टीकाकरण सत्र", icon: "syringe", days: [3], time: "9:30 AM", bring: ["MCP card (Mother and Child Protection card)", "Previous vaccination record"],
-    match: /vaccin|immuni[sz]|\bteeka\b|\btika\b|tikakaran|booster|टीका|टीकाकरण/ },
-  { id: "anc", name: "PMSMA antenatal clinic (9th of every month)", hi: "प्रधानमंत्री सुरक्षित मातृत्व अभियान जांच (हर महीने की 9 तारीख)", icon: "baby", monthDay: 9, time: "10:00 AM", bring: ["MCP card", "Earlier scan and test reports"],
-    match: /pregnan|garbh|anc\b|antenatal|गर्भ|pet se/ },
-  { id: "ncd", name: "NCD clinic (BP, sugar)", hi: "एनसीडी क्लिनिक (बीपी, शुगर)", icon: "heart", days: [2, 5], time: "11:00 AM", bring: ["Old prescription", "BP or sugar diary if you keep one", "Medicine strips"],
-    match: /\bbp\b|blood pressure|sugar|diabet|insulin|hypertens|बीपी|शुगर|मधुमेह|prescription|refill|dawai|dawa|दवा/ },
-  { id: "rep", name: "Reports and certificates desk", hi: "रिपोर्ट और प्रमाण पत्र काउंटर", icon: "doc", days: [1, 2, 3, 4, 5, 6], time: "2:00 PM", bring: ["Test reports", "ID for certificates"],
-    match: /report|result|certificate|fitness|प्रमाण|रिपोर्ट|सर्टिफिकेट/ },
-  { id: "dress", name: "Dressing room", hi: "ड्रेसिंग रूम", icon: "bandage", days: [1, 2, 3, 4, 5, 6], time: "9:00 AM", bring: ["Discharge or wound card"],
-    match: /dressing|wound|stitch|पट्टी|ड्रेसिंग/ },
-  { id: "opd", name: "General OPD", hi: "सामान्य ओपीडी", icon: "steth", days: [1, 2, 3, 4, 5, 6], time: "9:00 AM", bring: ["Old prescriptions and reports", "ABHA health ID if you have one (optional)"],
+  { id: "imm", name: "Routine immunisation session", icon: "syringe", days: [3], time: "9:30 AM", bring: ["MCP card (Mother and Child Protection card)", "Previous vaccination record"],
+    match: /vaccin|immuni[sz]|\bteeka\b|\btika\b|tikakaran|booster/ },
+  { id: "anc", name: "PMSMA antenatal clinic (9th of every month)", icon: "baby", monthDay: 9, time: "10:00 AM", bring: ["MCP card", "Earlier scan and test reports"],
+    match: /pregnan|garbh|anc\b|antenatal|pet se/ },
+  { id: "ncd", name: "NCD clinic (BP, sugar)", icon: "heart", days: [2, 5], time: "11:00 AM", bring: ["Old prescription", "BP or sugar diary if you keep one", "Medicine strips"],
+    match: /\bbp\b|blood pressure|sugar|diabet|insulin|hypertens|prescription|refill|dawai|dawa/ },
+  { id: "rep", name: "Reports and certificates desk", icon: "doc", days: [1, 2, 3, 4, 5, 6], time: "2:00 PM", bring: ["Test reports", "ID for certificates"],
+    match: /report|result|certificate|fitness/ },
+  { id: "dress", name: "Dressing room", icon: "bandage", days: [1, 2, 3, 4, 5, 6], time: "9:00 AM", bring: ["Discharge or wound card"],
+    match: /dressing|wound|stitch/ },
+  { id: "opd", name: "General OPD", icon: "steth", days: [1, 2, 3, 4, 5, 6], time: "9:00 AM", bring: ["Old prescriptions and reports", "ABHA health ID if you have one (optional)"],
     match: /.*/ }
 ];
 

@@ -47,24 +47,15 @@
     { id: "T29", group: "Routine", desc: "Want to collect blood test reports and show them to the doctor", age: 33, expect: "ROUTINE", rule: "R1" },
     { id: "T30", group: "Routine", desc: "Medical fitness certificate needed for college admission", age: 18, expect: "ROUTINE", rule: "R1" },
 
-    // Hindi in Devanagari (Sanket 2.0)
-    { id: "T31", group: "Hindi", desc: "मेरे पिता के सीने में दर्द है और पसीना आ रहा है", age: 60, expect: "EMERGENCY", rule: "E1" },
-    { id: "T32", group: "Hindi", desc: "खेत में काम करते समय साँप ने काट लिया", age: 35, expect: "EMERGENCY", rule: "E10" },
-    { id: "T33", group: "Hindi", desc: "बेटे ने गलती से कीटनाशक पी लिया है", age: 16, expect: "EMERGENCY", rule: "E9" },
-    { id: "T34", group: "Hindi", desc: "चार दिन से बुखार है और अब मसूड़ों से खून आ रहा है", age: 22, expect: "EMERGENCY", rule: "E12" },
-    { id: "T35", group: "Hindi", desc: "सीने में हल्का सा दर्द है, घर वाले बोलते हैं गैस है, कुछ नहीं है", age: 57, expect: "EMERGENCY", rule: "E1" },
-    { id: "T36", group: "Hindi", desc: "तीन दिन से तेज़ बुखार है और बदन दर्द", age: 30, expect: "SAME_DAY", rule: "S2" },
-    { id: "T37", group: "Hindi", desc: "सांस की दिक्कत नहीं है, बस खांसी है एक हफ्ते से", age: 44, expect: "SAME_DAY", rule: "F2" },
-    { id: "T38", group: "Hindi", desc: "बच्चे का टीका लगवाना है, छह हफ्ते वाला", age: 0.2, expect: "ROUTINE", rule: "R1" },
     // Past medical history: can only raise a lane
-    { id: "T40", group: "History", desc: "Seene mein thodi bechaini hai since evening", age: 62, history: { conditions: ["heart"] }, expect: "EMERGENCY", rule: "H1" },
-    { id: "T41", group: "History", desc: "Fever since last night, 100 degree", age: 48, history: { conditions: ["lowimm"] }, expect: "EMERGENCY", rule: "H2" },
-    { id: "T42", group: "History", desc: "Bathroom mein gir gaya, haath pe neel pad gaya", age: 70, history: { meds: ["thinners"] }, expect: "EMERGENCY", rule: "H3" },
-    { id: "T43", group: "History", desc: "Need a check-up, ulti ho rahi hai aur khana nahi kha pa rahe", age: 55, history: { conditions: ["diabetes"], meds: ["insulin"] }, expect: "SAME_DAY", rule: "H5" },
-    { id: "T44", group: "History", desc: "Knee pain follow-up, still painful after the tablets", age: 45, history: { repeatVisit: true }, expect: "SAME_DAY", rule: "H9" },
-    { id: "T45", group: "History", desc: "Ankh mein dhundhla dikh raha hai aur sir dard", age: 24, history: { conditions: ["pregnant"] }, expect: "EMERGENCY", rule: "E13" },
-    { id: "T46", group: "History", desc: "Need my BP check and repeat prescription for next month", age: 66, history: { conditions: ["bp", "diabetes"] }, expect: "ROUTINE", rule: "R1" },
-    { id: "T47", group: "History", desc: "Pump se bhi aaram nahi mil raha, khansi bahut hai", age: 35, history: { conditions: ["lung"] }, expect: "EMERGENCY", rule: "H4" },
+    { id: "T31", group: "History", desc: "Seene mein thodi bechaini hai since evening", age: 62, history: { conditions: ["heart"] }, expect: "EMERGENCY", rule: "H1" },
+    { id: "T32", group: "History", desc: "Fever since last night, 100 degree", age: 48, history: { conditions: ["lowimm"] }, expect: "EMERGENCY", rule: "H2" },
+    { id: "T33", group: "History", desc: "Bathroom mein gir gaya, haath pe neel pad gaya", age: 70, history: { meds: ["thinners"] }, expect: "EMERGENCY", rule: "H3" },
+    { id: "T34", group: "History", desc: "Need a check-up, ulti ho rahi hai aur khana nahi kha pa rahe", age: 55, history: { conditions: ["diabetes"], meds: ["insulin"] }, expect: "SAME_DAY", rule: "H5" },
+    { id: "T35", group: "History", desc: "Knee pain follow-up, still painful after the tablets", age: 45, history: { repeatVisit: true }, expect: "SAME_DAY", rule: "H9" },
+    { id: "T36", group: "History", desc: "Ankh mein dhundhla dikh raha hai aur sir dard", age: 24, history: { conditions: ["pregnant"] }, expect: "EMERGENCY", rule: "E13" },
+    { id: "T37", group: "History", desc: "Need my BP check and repeat prescription for next month", age: 66, history: { conditions: ["bp", "diabetes"] }, expect: "ROUTINE", rule: "R1" },
+    { id: "T38", group: "History", desc: "Pump se bhi aaram nahi mil raha, khansi bahut hai", age: 35, history: { conditions: ["lung"] }, expect: "EMERGENCY", rule: "H4" },
     { id: "T39", group: "Fallback", desc: "আমার মাথা খুব ব্যথা করছে দুই দিন ধরে", age: 40, expect: "SAME_DAY", rule: "F4" }
   ];
 

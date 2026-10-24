@@ -13,9 +13,9 @@ const ROUTES = {
   "": { view: home, title: "Sanket" },
   patient: { view: patient, title: "Patient", nav: "Patient", icon: "user" },
   desk: { view: desk, title: "Front desk", nav: "Front desk", icon: "desk" },
-  clinician: { view: clinician, title: "Clinician", nav: "Clinician", icon: "steth" },
-  insights: { view: insights, title: "Insights", nav: "Insights", icon: "chart" },
-  about: { view: about, title: "Method & safety", nav: "Method", icon: "book" }
+  clinician: { view: clinician, title: "Doctor", nav: "Doctor", icon: "steth" },
+  insights: { view: insights, title: "Dashboard", nav: "Dashboard", icon: "chart" },
+  about: { view: about, title: "About", nav: "About", icon: "book" }
 };
 
 store.load();
@@ -27,7 +27,7 @@ document.body.insertAdjacentHTML("afterbegin", `
     <a href="tel:108">${icon("phone")}108 Ambulance</a><a href="tel:112">112 Emergency</a>
   </div>
   <header class="topbar">
-    <a class="brand" href="#/">${logo()}<span>Sanket</span><small class="hi">संकेत</small></a>
+    <a class="brand" href="#/">${logo()}<span>Sanket</span></a>
     <nav class="nav" aria-label="Windows"><span class="pill" aria-hidden="true"></span>
       ${Object.entries(ROUTES).filter(([, r]) => r.nav).map(([k, r]) => `<a href="#/${k}" data-k="${k}">${icon(r.icon)}${r.nav}</a>`).join("")}
     </nav>
@@ -38,7 +38,7 @@ document.body.insertAdjacentHTML("afterbegin", `
   <main id="main"></main>
   <footer class="foot"><div class="in">
     <span>Sanket · AI Innovate-A-Thon, VIT · Question 4 · Synthetic data only. Not a medical device. Sorts requests; does not diagnose.</span>
-    <span><a href="#/about">Method & safety</a> · <a href="https://github.com/debi910/Sanket" target="_blank" rel="noopener">Source on GitHub</a></span>
+    <span><a href="#/about">About</a> · <a href="https://github.com/debi910/Sanket" target="_blank" rel="noopener">Source on GitHub</a></span>
   </div></footer>`);
 
 const main = document.getElementById("main");

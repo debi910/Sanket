@@ -49,8 +49,7 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
-  --font: "Inter", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-hi: "Noto Sans Devanagari", "Inter", system-ui, sans-serif;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   --topbar-h: 60px;
@@ -138,7 +137,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
-:lang(hi), .hi { font-family: var(--font-hi); }
 h1, h2, h3, h4 { margin: 0; letter-spacing: -0.02em; line-height: 1.15; font-weight: 650; }
 p { margin: 0; }
 a { color: inherit; }
