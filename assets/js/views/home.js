@@ -1,11 +1,12 @@
 // Landing page: what Sanket is, the four windows and how it works.
 import { esc, icon } from "../ui.js";
+import { ILLUS } from "../illus.js";
 
 const ROLES = [
-  { href: "#/patient", icon: "user", title: "Patient", text: "Describe the problem, get a token or 108 advice.", tone: "brand" },
-  { href: "#/desk", icon: "desk", title: "Front desk", text: "See the queue by lane and confirm each one.", tone: "saffron" },
-  { href: "#/clinician", icon: "steth", title: "Doctor", text: "Review today's urgent patients and record the outcome.", tone: "info" },
-  { href: "#/insights", icon: "chart", title: "Dashboard", text: "Check what the rules missed and what staff changed.", tone: "em" }
+  { href: "#/patient", icon: "user", art: "patient", title: "Patient", text: "Describe the problem, get a token or 108 advice.", tone: "brand" },
+  { href: "#/desk", icon: "desk", art: "desk", title: "Front desk", text: "See the queue by lane and confirm each one.", tone: "saffron" },
+  { href: "#/clinician", icon: "steth", art: "doctor", title: "Doctor", text: "Review today's urgent patients and record the outcome.", tone: "info" },
+  { href: "#/insights", icon: "chart", art: "dashboard", title: "Dashboard", text: "Check what the rules missed and what staff changed.", tone: "em" }
 ];
 
 export function render(root) {
@@ -24,6 +25,7 @@ export function render(root) {
         </div>
         <div class="hero-art" aria-hidden="true">${heroArt()}</div>
       </div>
+      <svg class="ecg-band" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 34h300l14-22 16 44 14-30 10 8h180l12-18 14 36 12-26 8 10h200l14-22 16 44 14-30 10 8h356" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pathLength="1" vector-effect="non-scaling-stroke"/></svg>
     </section>
 
     <section class="wrap">
@@ -32,10 +34,12 @@ export function render(root) {
       <div class="grid g4 roles stagger">
         ${ROLES.map((r) => `
         <a class="card role tone-${r.tone}" href="${r.href}">
-          <span class="r-ico">${icon(r.icon)}</span>
-          <h3>${esc(r.title)}</h3>
-          <p>${esc(r.text)}</p>
-          <span class="r-go">Open ${icon("arrowR")}</span>
+          <div class="r-art">${ILLUS[r.art]()}</div>
+          <div class="r-txt">
+            <h3>${esc(r.title)}</h3>
+            <p>${esc(r.text)}</p>
+            <span class="r-go">Open ${icon("arrowR")}</span>
+          </div>
         </a>`).join("")}
       </div>
     </section>
@@ -43,9 +47,9 @@ export function render(root) {
     <section class="wrap">
       <div class="sec-head"><h2>How it works</h2></div>
       <ol class="how three stagger">
-        <li><span class="h-n">1</span><b>Red flags first</b><p>Chest pain, stroke signs, snakebite or poisoning go straight to 108. No waiting.</p></li>
-        <li><span class="h-n">2</span><b>Reassurance is ignored</b><p>"Kuch nahi hai, bas gas hai" cannot make a request less urgent.</p></li>
-        <li><span class="h-n">3</span><b>A person decides</b><p>Staff confirm every lane. Routine visits are booked on the right clinic day.</p></li>
+        <li>${icon("ambulance", "h-ico")}<span class="h-n">1</span><b>Red flags first</b><p>Chest pain, stroke signs, snakebite or poisoning go straight to 108. No waiting.</p></li>
+        <li>${icon("shield", "h-ico")}<span class="h-n">2</span><b>Reassurance is ignored</b><p>"Kuch nahi hai, bas gas hai" cannot make a request less urgent.</p></li>
+        <li>${icon("users", "h-ico")}<span class="h-n">3</span><b>A person decides</b><p>Staff confirm every lane. Routine visits are booked on the right clinic day.</p></li>
       </ol>
     </section>
   </div>`;

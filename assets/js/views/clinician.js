@@ -5,18 +5,20 @@ import { esc, icon, toast, waitText } from "../ui.js";
 import * as store from "../store.js";
 import { OUTCOMES } from "../store.js";
 import { CLINIC } from "../india.js";
+import { ILLUS } from "../illus.js";
 import { headerHtml, bodyHtml, ageText } from "./detail.js";
 
 export function render(root) {
   let sel = null;
   root.innerHTML = `
   <div class="wrap view clin">
-    <header class="page-head">
+    <header class="page-head art-head tone-info">
       <div>
         <div class="eyebrow"><span class="dot"></span>${esc(CLINIC.mo)}</div>
         <h1>Today's urgent patients</h1>
         <p>Oldest first. Call back, then pick an outcome.</p>
       </div>
+      <div class="ph-art">${ILLUS.doctor()}</div>
     </header>
     <div class="clin-grid">
       <aside class="card flush clin-list" data-list></aside>
@@ -38,7 +40,7 @@ export function render(root) {
         <span class="num tok">${esc(r.token)}</span>
         <span class="cl-main"><span class="cl-title">${esc(r.description)}</span><span class="muted">${ageText(r.age)} · ${esc(r.result.reasons[0] ? r.result.reasons[0].title : "Review")}</span></span>
         <span class="num cl-wait">${waitText(now - r.createdAt)}</span>
-      </button>`).join("") : `<div class="empty">${icon("check")}<b>All reviewed</b><span class="muted">Nothing is waiting for you.</span></div>`);
+      </button>`).join("") : `<div class="empty">${ILLUS.chai()}<b>All reviewed</b><span class="muted">Nothing is waiting for you.</span></div>`);
     $("[data-list]").querySelectorAll(".cl-row").forEach((b) => b.addEventListener("click", () => { sel = b.dataset.id; paint(); }));
     paintDetail();
   }
@@ -46,13 +48,13 @@ export function render(root) {
   function paintDetail() {
     const el = $("[data-detail]");
     const r = sel && store.get(sel);
-    if (!r) { el.innerHTML = `<div class="empty big">${icon("steth")}<b>Nothing to review</b><span class="muted">Same-day requests appear here once the front desk sends them.</span></div>`; return; }
+    if (!r) { el.innerHTML = `<div class="empty big">${ILLUS.chai()}<b>Nothing to review</b><span class="muted">Same-day requests appear here once the front desk sends them.</span></div>`; return; }
     el.innerHTML = `
       <div class="cd-head">${headerHtml(r, false)}</div>
       <div class="cd-body">${bodyHtml(r)}</div>
       <div class="cd-act">
         <span class="label">Outcome</span>
-        <div class="outcomes">${Object.entries(OUTCOMES).map(([k, o]) => `<button class="oc ${k}" data-oc="${k}">${icon(o.icon)}<span>${esc(o.label)}</span></button>`).join("")}</div>
+        <div class="outcomes">${Object.entries(OUTCOMES).map(([k, o]) => `<button class="oc ${k}" data-oc="${k}"><span class="oc-i">${icon(o.icon)}</span><span>${esc(o.label)}</span></button>`).join("")}</div>
         <textarea class="textarea" data-note placeholder="Note (needed if lowering to routine)" style="min-height:56px"></textarea>
         <button class="btn ghost sm" data-flag>${icon("flag")} Rule looks wrong</button>
       </div>`;

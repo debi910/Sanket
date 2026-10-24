@@ -3,6 +3,7 @@
 import { esc, icon, highlight, evidenceGroups, laneChip, fmtNum, countUp } from "../ui.js";
 import { STATS, SOURCES } from "../india.js";
 import * as charts from "../charts.js";
+import { ILLUS } from "../illus.js";
 
 const DEMO = "Seene mein halka sa dard hai, ghar wale bolte hain gas hai, kuch nahi hai";
 const src = (k) => `<a class="src" href="${SOURCES[k].url}" target="_blank" rel="noopener">${esc(SOURCES[k].label.split(",")[0])}</a>`;
@@ -13,11 +14,11 @@ export function render(root) {
   const pass = rows.filter((r) => r.pass).length;
   root.innerHTML = `
   <div class="wrap narrow view about">
-    <header class="page-head"><div>
+    <header class="page-head art-head tone-brand"><div>
       <div class="eyebrow"><span class="dot"></span>About Sanket</div>
       <h1>A sorting aid, not a doctor</h1>
       <p>Sanket suggests a lane for staff to check. It gives no diagnosis and has not been tested on real patients. All data is synthetic.</p>
-    </div></header>
+    </div><div class="ph-art">${ILLUS.shield()}</div></header>
 
     <section class="guard-demo card">
       <div class="gd-copy">

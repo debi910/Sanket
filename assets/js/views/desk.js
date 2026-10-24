@@ -4,6 +4,7 @@ import { esc, icon, toast, drawer, modal, segmented, laneChip, LANE, waitText } 
 import * as store from "../store.js";
 import { aiCheck } from "../ai.js";
 import { CLINIC } from "../india.js";
+import { ILLUS } from "../illus.js";
 import { headerHtml, bodyHtml, SOURCE, statusTag, ageText } from "./detail.js";
 
 const REASONS = {
@@ -17,12 +18,14 @@ export function render(root) {
   let tab = "todo", openId = null, focusIdx = -1;
   root.innerHTML = `
   <div class="wrap view desk">
-    <header class="page-head">
+    <header class="page-head art-head tone-saffron">
       <div>
         <div class="eyebrow"><span class="dot"></span>${esc(CLINIC.name)}</div>
-        <h1>Front desk</h1>
+        <h1>${greet()}, Meena</h1>
+        <p>Here is today's queue. Emergencies are always on top.</p>
+        <button class="btn primary" data-new style="margin-top:14px">${icon("plus")} Phone or walk-in</button>
       </div>
-      <button class="btn primary" data-new>${icon("plus")} Phone or walk-in</button>
+      <div class="ph-art">${ILLUS.desk()}</div>
     </header>
     <div class="counts" data-counts></div>
     <div class="q-bar">
@@ -42,19 +45,19 @@ export function render(root) {
     const todo = s.requests.filter((r) => !DONE.includes(r.status) && !(r.lane === "SAME_DAY" && r.status === "accepted"));
     const waiting = (l) => todo.filter((r) => r.lane === l).length;
     $("[data-counts]").innerHTML = ["EMERGENCY", "SAME_DAY", "ROUTINE"].map((l) => `
-      <div class="count ${l}"><strong class="num">${waiting(l)}</strong><span>${LANE[l].short} to act on</span></div>`).join("");
+      <div class="count ${l}${waiting(l) && l === "EMERGENCY" ? " hot" : ""}"><span class="c-ico">${icon({ EMERGENCY: "ambulance", SAME_DAY: "clock", ROUTINE: "calendar" }[l])}</span><strong class="num">${waiting(l)}</strong><span>${LANE[l].short} to act on</span></div>`).join("");
     let list = tab === "todo" ? todo : s.requests.filter((r) => !todo.includes(r));
     list = list.slice().sort((a, b) => store.laneRank(b.lane) - store.laneRank(a.lane) || a.createdAt - b.createdAt);
     const el = $("[data-list]");
-    if (!list.length) { el.innerHTML = `<div class="empty">${icon("check")}<b>${tab === "todo" ? "All caught up" : "Nothing done yet"}</b></div>`; return; }
+    if (!list.length) { el.innerHTML = `<div class="empty">${ILLUS.chai()}<b>${tab === "todo" ? "All caught up. Chai break!" : "Nothing done yet"}</b></div>`; return; }
     el.innerHTML = list.map((r, i) => {
       const late = tab === "todo" && now - r.createdAt > LIMIT[r.lane];
       return `
       <button class="q-row ${r.lane} ${tab === "done" ? "done" : ""} ${i === focusIdx ? "focus" : ""}" role="listitem" data-id="${r.id}">
         <span class="rail"></span>
-        <span class="q-token num">${esc(r.token)}</span>
+        <span class="q-tok"><span class="q-token num">${esc(r.token)}</span><span class="q-av ${r.source}" title="${SOURCE[r.source].label}">${icon(SOURCE[r.source].icon)}</span></span>
         <span class="q-main">
-          <span class="q-top">${laneChip(r.lane)}${tab === "done" ? statusTag(r.status) : ""}<span class="q-meta">${icon(SOURCE[r.source].icon)}${ageText(r.age)}</span></span>
+          <span class="q-top">${laneChip(r.lane)}${tab === "done" ? statusTag(r.status) : ""}<span class="q-meta">${ageText(r.age)}</span></span>
           <span class="q-text">${esc(r.description)}</span>
         </span>
         <span class="q-wait ${late ? "late" : ""}"><b class="num">${waitText(now - r.createdAt)}</b><span class="muted">waiting</span></span>
@@ -191,4 +194,9 @@ export function render(root) {
   const tick = setInterval(() => { if (!openId) paint(); }, 30000);
   paint();
   return () => { unsub(); clearInterval(tick); document.removeEventListener("keydown", onKey); };
+}
+
+function greet() {
+  const h = new Date().getHours();
+  return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
 }

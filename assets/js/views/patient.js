@@ -4,6 +4,9 @@ import { esc, icon, toast, fmtDate, LANE } from "../ui.js";
 import * as store from "../store.js";
 import { aiCheck } from "../ai.js";
 import { CLINIC } from "../india.js";
+import { ILLUS, confetti } from "../illus.js";
+
+const H_ICON = { diabetes: "drop", bp: "heart", heart: "heart", lung: "wind", kidney: "drop", tb: "pill", lowimm: "shield", pregnant: "baby", thinners: "pill", insulin: "syringe", repeatVisit: "refresh", recentAdmission: "hospital" };
 
 const CHIPS = ["Fever for 3 days now", "Baby's vaccination is due this week", "Need a prescription refill for BP", "Want to show my test reports", "Dog bite this morning"];
 const STEPS = ["Patient", "Health history", "Problem"];
@@ -19,6 +22,7 @@ export function render(root) {
       <h1>Request a visit</h1>
       <p class="ink2">Three quick steps. Write in English or Hinglish.</p>
       <ol class="p-dots">${STEPS.map((s, i) => `<li data-s="${i + 1}"><span>${i + 1}</span>${s}</li>`).join("")}</ol>
+      <div class="p-progress"><i style="width:0"></i></div>
     </div>
     <section class="p-card card" aria-live="polite"><div class="p-body"></div></section>
     <p class="hint p-foot">${icon("shield")} No phone number or ID needed. Sanket sorts requests; it does not diagnose.</p>
@@ -28,6 +32,7 @@ export function render(root) {
   function show(s) {
     step = s;
     root.querySelector(".p-dots").hidden = s > 3;
+    root.querySelector(".p-progress i").style.width = Math.min(100, (s / 3) * 100) + "%";
     root.querySelectorAll(".p-dots li").forEach((li) => { const n = Number(li.dataset.s); li.classList.toggle("on", n === s); li.classList.toggle("done", n < s); });
     body.classList.remove("swap"); void body.offsetWidth; body.classList.add("swap");
     [null, stepOne, stepHistory, stepProblem, result][s]();
@@ -41,6 +46,7 @@ export function render(root) {
 
   function stepOne() {
     body.innerHTML = `
+      <div class="p-art">${ILLUS.who()}</div>
       <h2 class="p-h">Who is this for?</h2>
       <div class="choice row">
         <label class="opt"><input type="radio" name="who" value="self" ${draft.forWhom === "self" ? "checked" : ""}><span class="ico">${icon("user")}</span><strong>For me</strong></label>
@@ -61,9 +67,10 @@ export function render(root) {
     ];
     const on = (g, k) => (g === "flags" ? !!H[k] : H[g].includes(k));
     body.innerHTML = `
+      <div class="p-art">${ILLUS.history()}</div>
       <h2 class="p-h">Any long-term illness or regular medicine?</h2>
       <p class="ink2" style="margin:-10px 0 16px">Optional. Tick what applies, it helps us see you sooner.</p>
-      <div class="chips">${items.map(([g, k, v]) => `<button type="button" class="chip" data-g="${g}" data-k="${k}" aria-pressed="${on(g, k)}">${esc(v)}</button>`).join("")}</div>
+      <div class="chips">${items.map(([g, k, v]) => `<button type="button" class="chip" data-g="${g}" data-k="${k}" aria-pressed="${on(g, k)}">${icon(H_ICON[k] || "doc", "ci")}${esc(v)}</button>`).join("")}</div>
       ${actions(true, "Continue")}`;
     body.querySelectorAll(".chip").forEach((c) => c.addEventListener("click", () => {
       const v = c.getAttribute("aria-pressed") !== "true", { g, k } = c.dataset;
@@ -77,6 +84,7 @@ export function render(root) {
   function stepProblem() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     body.innerHTML = `
+      <div class="p-art">${ILLUS.problem()}</div>
       <h2 class="p-h">What is the problem?</h2>
       <div class="p-ta">
         <textarea id="p-desc" class="textarea" placeholder="e.g. 3 din se bukhar hai aur sir dard" maxlength="800" autofocus>${esc(draft.description)}</textarea>
@@ -130,7 +138,7 @@ export function render(root) {
     if (lane === "EMERGENCY") {
       html = `
       <div class="res em">
-        <div class="res-ring">${icon("ambulance")}</div>
+        <div class="p-art em">${ILLUS.ambulance()}</div>
         <h2>Call 108 now</h2>
         <p>Do not wait for an appointment. Call an ambulance or go to the nearest emergency department.</p>
         <div class="res-calls">
@@ -165,6 +173,7 @@ export function render(root) {
       Object.assign(draft, { description: "", selfEmergency: false, history: emptyHistory() }); current = null; show(1);
     });
     body.querySelector("[data-ics]")?.addEventListener("click", () => downloadIcs(r));
+    if (lane === "ROUTINE") requestAnimationFrame(() => confetti(body.querySelector(".ticket-token")));
   }
 
   show(1);
