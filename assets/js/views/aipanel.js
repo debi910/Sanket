@@ -2,7 +2,7 @@
 // The rules have already decided; pressing Ask AI asks the chosen model once.
 // Its lane is shown beside the rules lane, and engine combine() lets it only
 // raise the lane, never lower it.
-import { esc, icon, laneChip, LANE } from "../ui.js";
+import { esc, icon, laneChip, LANE, toast } from "../ui.js";
 import * as store from "../store.js";
 import { aiCheck, hasKey } from "../ai.js";
 import { openSettings } from "./settings.js";
@@ -35,8 +35,9 @@ export function bindAiPanel(root, r, repaint) {
   root.querySelector("[data-keyset]")?.addEventListener("click", () => openSettings(repaint));
   root.querySelector("[data-ask]")?.addEventListener("click", async (e) => {
     const b = e.currentTarget; b.disabled = true; b.innerHTML = `<span class="spinner"></span> Asking`;
-    const { ai, failed, skipped } = await aiCheck(r, r.result, store.settings());
+    const { ai, failed, skipped, error } = await aiCheck(r, r.result, store.settings());
     if (skipped) { openSettings(repaint); b.disabled = false; b.innerHTML = `${icon("spark")} Ask AI`; return; }
+    if (error) toast(`AI: ${error}`, "info");
     store.applyAi(r.id, ai, failed);
     repaint();
   });

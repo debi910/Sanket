@@ -106,7 +106,7 @@ function seed() {
     const raised = Math.round(rand() * 2.4);
     days.push({ date: d.setHours(12, 0, 0, 0), total, E, S, R: total - E - S, raised, lowered: Math.round(1 + rand() * 4), guard: Math.round(total * (0.05 + rand() * 0.05)), reviewMedian: Math.round(38 + rand() * 50) });
   }
-  return { version: 5, seededAt: now, seq, requests, log, days, ruleFlags: [], settings: { ai: false, provider: "gemini", model: "gemini-2.5-flash" } };
+  return { version: 5, seededAt: now, seq, requests, log, days, ruleFlags: [], settings: { ai: false, provider: "gemini", model: "gemini-3.5-flash-lite" } };
 }
 
 export function load() {

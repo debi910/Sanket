@@ -2,7 +2,7 @@
 // dashboard, front desk and doctor windows.
 import { esc, icon, toast, modal, segmented } from "../ui.js";
 import * as store from "../store.js";
-import { PROVIDERS, getKey, setKey } from "../ai.js";
+import { PROVIDERS, getStoredKey, setKey, hasBuiltInKey } from "../ai.js";
 
 export function openSettings(onSaved) {
   const st = store.settings();
@@ -26,11 +26,11 @@ export function openSettings(onSaved) {
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px"><button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-save>Save</button></div>`, { label: "Settings" });
   const el = m.el;
-  const keys = { gemini: getKey("gemini"), claude: getKey("claude") };
+  const keys = { gemini: getStoredKey("gemini"), claude: getStoredKey("claude") };
   const keyIn = el.querySelector("[data-key]"), modelSel = el.querySelector("[data-model]");
   const paint = () => {
     const p = PROVIDERS[provider];
-    keyIn.value = keys[provider]; keyIn.placeholder = p.keyHint;
+    keyIn.value = keys[provider]; keyIn.placeholder = hasBuiltInKey(provider) ? "Built-in demo key in use" : p.keyHint;
     el.querySelector("[data-keylabel]").textContent = `${provider === "gemini" ? "Gemini" : "Claude"} API key`;
     el.querySelector("[data-keyhint]").innerHTML = `Get one at <a href="${p.keyUrl}" target="_blank" rel="noopener">${esc(p.keyUrl.replace("https://", ""))}</a>. Kept only in this browser and sent only to ${provider === "gemini" ? "Google" : "Anthropic"}. For a real clinic, this call belongs on a server.`;
     modelSel.innerHTML = p.models.map((x) => `<option ${x === st.model ? "selected" : ""}>${x}</option>`).join("");

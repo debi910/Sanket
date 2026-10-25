@@ -8,12 +8,18 @@ const SDK_URL = "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.132.1/+esm";
 const GEMINI_URL = (model) => `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
 export const PROVIDERS = {
-  gemini: { label: "Google Gemini (free key)", models: ["gemini-2.5-flash", "gemini-2.5-flash-lite"], keyHint: "AIza…", keyUrl: "https://aistudio.google.com/app/apikey" },
+  gemini: { label: "Google Gemini (free key)", models: ["gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"], keyHint: "Paste your Gemini key", keyUrl: "https://aistudio.google.com/app/apikey" },
   claude: { label: "Anthropic Claude", models: ["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5"], keyHint: "sk-ant-…", keyUrl: "https://console.anthropic.com/settings/keys" }
 };
 
+// Optional built-in demo key per provider. Left empty: GitHub push protection
+// rejects commits that contain an API key.
+const BUILT_IN = {};
+
 const keyName = (p) => `sanket.key.${p}`;
-export function getKey(provider) { try { return localStorage.getItem(keyName(provider)) || ""; } catch (e) { return ""; } }
+export function getStoredKey(provider) { try { return localStorage.getItem(keyName(provider)) || ""; } catch (e) { return ""; } }
+export const hasBuiltInKey = (provider) => !!BUILT_IN[provider];
+export function getKey(provider) { return getStoredKey(provider) || BUILT_IN[provider] || ""; }
 export function setKey(provider, k) { try { k ? localStorage.setItem(keyName(provider), k) : localStorage.removeItem(keyName(provider)); } catch (e) { /* ignore */ } }
 export const hasKey = (provider) => !!getKey(provider);
 
@@ -48,7 +54,7 @@ async function askClaude(apiKey, model, prompt) {
 
 async function askGemini(apiKey, model, prompt) {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 20000);
+  const timer = setTimeout(() => ctrl.abort(), 45000);
   try {
     const res = await fetch(GEMINI_URL(model), {
       method: "POST",
@@ -56,10 +62,13 @@ async function askGemini(apiKey, model, prompt) {
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0, responseMimeType: "application/json" }
+        generationConfig: { temperature: 0, responseMimeType: "application/json", thinkingConfig: { thinkingLevel: "low" } }
       })
     });
-    if (!res.ok) throw new Error(`Gemini HTTP ${res.status}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error((err.error && err.error.message) || `Gemini HTTP ${res.status}`);
+    }
     const data = await res.json();
     const parts = (((data.candidates || [])[0] || {}).content || {}).parts || [];
     return parts.map((p) => p.text || "").join("");
@@ -79,11 +88,11 @@ export async function aiCheck(request, ruleResult, settings = {}) {
     const prompt = window.TriageEngine.aiPrompt(req, ruleResult.framingGuard ? ruleResult.framingGuard.guardedText : request.description);
     const text = provider === "claude" ? await askClaude(apiKey, model, prompt) : await askGemini(apiKey, model, prompt);
     const parsed = window.TriageEngine.parseAiReply(text);
-    if (!parsed) return { ai: null, failed: true };
+    if (!parsed) return { ai: null, failed: true, error: "The AI reply was not a usable lane" };
     parsed.provider = `${provider === "claude" ? "Claude" : "Gemini"} (${model})`;
     return { ai: parsed, failed: false };
   } catch (e) {
     console.warn("AI second opinion failed", e);
-    return { ai: null, failed: true };
+    return { ai: null, failed: true, error: String((e && e.message) || e).slice(0, 140) };
   }
 }
