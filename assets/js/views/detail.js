@@ -1,7 +1,6 @@
 // The request panel shared by the front desk and doctor windows. The
 // essentials are shown first; everything else sits behind "More details".
 import { esc, icon, highlight, evidenceGroups, laneChip, LANE, ago, fmtTime, fmtDate } from "../ui.js";
-import { CLINIC } from "../india.js";
 import { OUTCOMES } from "../store.js";
 
 export const SOURCE = {
@@ -45,7 +44,7 @@ export function bodyHtml(r) {
   const hist = historyItems(r);
   const svc = r.service;
   const next = r.lane === "EMERGENCY"
-    ? `${icon("ambulance")}<span>Tell them to call <b>108</b> now. Nearest 24x7: <b>${esc(CLINIC.referral[1].name)}</b>, ${esc(CLINIC.referral[1].dist)}.</span>`
+    ? `${icon("ambulance")}<span>Tell them to call <b>108</b> now. Or take them to the nearest 24x7 hospital.</span>`
     : svc ? `${icon("calendar")}<span>${r.lane === "ROUTINE" ? "Booked" : "If routine later"}: <b>${esc(svc.name)}</b>, ${esc(fmtDate(svc.date))} ${esc(svc.time)}</span>` : "";
   const others = (res.otherSignals || []).filter((x) => !res.reasons.some((y) => y.ruleId === x.ruleId));
   const ai = !res.ai ? "Off (rules only)" : res.ai.failed ? "Failed, so routine was raised to review" : res.ai.escalated ? `Raised the lane to ${LANE[res.ai.level].short}` : `Agreed (${LANE[res.ai.level].short})`;

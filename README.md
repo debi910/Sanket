@@ -31,7 +31,7 @@ It is a static site with no build step.
 
 ```bash
 python3 -m http.server 8000   # then open http://localhost:8000
-node tests/tests.js           # 44 routing test cases
+node tests/tests.js           # 45 routing test cases
 ```
 
 You can also run the test cases in the browser under **About → Test cases**.
@@ -48,7 +48,7 @@ assets/js/india.js         public data with sources, referral chain, seasons, pr
 assets/js/views/*.js       home, patient, desk, clinician, insights, about
 assets/js/ai.js            optional Claude second reader (escalate-only)
 assets/css/*.css           design system and views
-tests/tests.js             44 test cases (node or browser)
+tests/tests.js             45 test cases (node or browser)
 SAFETY_NOTE.md             safety note
 ```
 

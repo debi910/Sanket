@@ -61,7 +61,7 @@
     { id: "E9", category: "EMERGENCY", title: "Poison, pesticide or chemical swallowed",
       reason: "Describes swallowing poison, pesticide, kerosene or a household chemical.",
       patterns: [/poison/, /pesticide/, /insecticide/, /(swallowed|drank|drunk|ate)( some| a| the)? (bleach|battery|batteries|chemical|phenyl|acid|kerosene|pills|tablets|toilet cleaner|rat poison)/,
-        /zeh?e?r (kha|pi|pee)/, /keetnashak/, /kida maar/, /keede ki dawai (pi|pee|kha)/, /(phenyl|kerosene|tezaab|tezab|acid) (pi|pee|kha) (liya|li|gaya|gayi)/] },
+        /zeh?e?r (kha|pi|pee)/, /keetnashak/, /kida maar/, /(keed[aei]|kide|kida) maar(ne)? (wali |ki )?(dawai|dawa|spray)/, /keede ki dawai (pi|pee|kha)/, /(phenyl|kerosene|tezaab|tezab|acid) (pi|pee|kha) (liya|li|gaya|gayi)/] },
     { id: "E10", category: "EMERGENCY", title: "Snakebite or scorpion sting",
       reason: "Describes a snakebite or scorpion sting, which need emergency care in India.",
       patterns: [/snake ?bite/, /bitten by a snake/, /snake (bit|has bitten)/, /scorpion/, /(saanp|saap|sanp) (ne )?(kaat|kat|dans)/, /(bichhu|bichu|bicchu) (ne )?(kaat|kat|dank|dunk)/] },

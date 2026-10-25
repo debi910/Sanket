@@ -80,7 +80,7 @@ function heroArt() {
     </svg>
     <div class="art-lanes">
       <div class="al EMERGENCY"><span class="lane EMERGENCY">Emergency</span><b>Call 108 now</b><span class="muted">E-007 · 0:40 to guidance</span></div>
-      <div class="al SAME_DAY"><span class="lane SAME_DAY">Same-day</span><b>Seen today</b><span class="muted">S-031 · Dr. Rao</span></div>
+      <div class="al SAME_DAY"><span class="lane SAME_DAY">Same-day</span><b>Seen today</b><span class="muted">S-031 · doctor call-back</span></div>
       <div class="al ROUTINE"><span class="lane ROUTINE">Routine</span><b>Wed · Immunisation</b><span class="muted">R-118 · bring MCP card</span></div>
     </div>
   </div>`;

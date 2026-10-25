@@ -146,7 +146,7 @@ export function render(root) {
           <a class="btn lg" href="tel:112">112 Emergency</a>
           ${mind ? `<a class="btn lg" href="tel:14416">14416 Tele-MANAS</a>` : ""}
         </div>
-        <p class="res-near">${icon("hospital")} Nearest 24x7: ${esc(CLINIC.referral[1].name)}, ${esc(CLINIC.referral[1].dist)}</p>
+        <p class="res-near">${icon("hospital")} Or go to the nearest 24x7 hospital emergency.</p>
       </div>`;
     } else {
       const isR = lane === "ROUTINE", svc = r.service;

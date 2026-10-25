@@ -56,7 +56,8 @@
     { id: "T36", group: "History", desc: "Ankh mein dhundhla dikh raha hai aur sir dard", age: 24, history: { conditions: ["pregnant"] }, expect: "EMERGENCY", rule: "E13" },
     { id: "T37", group: "History", desc: "Need my BP check and repeat prescription for next month", age: 66, history: { conditions: ["bp", "diabetes"] }, expect: "ROUTINE", rule: "R1" },
     { id: "T38", group: "History", desc: "Pump se bhi aaram nahi mil raha, khansi bahut hai", age: 35, history: { conditions: ["lung"] }, expect: "EMERGENCY", rule: "H4" },
-    { id: "T39", group: "Fallback", desc: "আমার মাথা খুব ব্যথা করছে দুই দিন ধরে", age: 40, expect: "SAME_DAY", rule: "F4" }
+    { id: "T39", group: "Fallback", desc: "আমার মাথা খুব ব্যথা করছে দুই দিন ধরে", age: 40, expect: "SAME_DAY", rule: "F4" },
+    { id: "T40", group: "India red flag", desc: "Bachhe ne galti se keede maarne wali dawai pee li, ulti kar raha hai", age: 6, expect: "EMERGENCY", rule: "E9" }
   ];
 
   // Checks for the AI combination rule: the AI can raise a lane, never lower it.

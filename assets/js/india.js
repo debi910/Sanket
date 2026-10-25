@@ -77,13 +77,13 @@ export function seasonWatch(date = new Date()) {
 
 // ---------- The demo clinic ----------
 export const CLINIC = {
-  name: "PHC Nandgaon",
-  block: "Block Nandgaon, demo district",
+  name: "Community clinic",
+  block: "Demo district",
   hours: "Mon to Sat, 9:00 AM to 4:00 PM",
-  mo: "Dr. A. Rao (Medical Officer)",
+  mo: "Medical officer",
   referral: [
-    { level: "This clinic", name: "PHC Nandgaon", dist: "", detail: "OPD, nurse review, ANC, immunisation, NCD clinic. No night emergency cover." },
-    { level: "First referral unit", name: "CHC Rampur (24x7 FRU)", dist: "14 km", detail: "24x7 emergency and delivery, basic surgery, blood storage." },
+    { level: "This clinic", name: "Community clinic", dist: "", detail: "OPD, nurse review, ANC, immunisation, NCD clinic. No night emergency cover." },
+    { level: "First referral unit", name: "the nearest 24x7 hospital", dist: "", detail: "24x7 emergency and delivery, basic surgery, blood storage." },
     { level: "District", name: "District Hospital", dist: "38 km", detail: "ICU, anti-snake venom stock, dialysis, specialists." }
   ]
 };

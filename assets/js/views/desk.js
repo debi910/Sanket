@@ -20,8 +20,8 @@ export function render(root) {
   <div class="wrap view desk">
     <header class="page-head art-head tone-saffron">
       <div>
-        <div class="eyebrow"><span class="dot"></span>${esc(CLINIC.name)}</div>
-        <h1>${greet()}, Meena</h1>
+        <div class="eyebrow"><span class="dot"></span>Front desk</div>
+        <h1>${greet()}</h1>
         <p>Here is today's queue. Emergencies are always on top.</p>
         <button class="btn primary" data-new style="margin-top:14px">${icon("plus")} Phone or walk-in</button>
       </div>

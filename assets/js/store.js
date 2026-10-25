@@ -11,7 +11,7 @@ const RANK = { ROUTINE: 1, SAME_DAY: 2, EMERGENCY: 3 };
 const listeners = new Set();
 let state = null;
 
-export const STAFF = { desk: "Front desk (Meena)", mo: "Dr. A. Rao" };
+export const STAFF = { desk: "Front desk", mo: "Medical officer" };
 
 function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
@@ -61,7 +61,9 @@ const SEED = [
   { m: 52, age: 78, forWhom: "family", source: "whatsapp", h: { conditions: ["diabetes", "bp", "kidney"] }, d: "Dadi ji ko kal se bahut kamzori aur chakkar aa rahe hain, khana bhi kam kha rahi hain", st: "new" },
   { m: 31, age: 30, source: "web", d: "Mild headache for 3 days, tension ki koi baat nahi, bas thoda sa hai", st: "new" },
   { m: 19, age: 47, source: "web", h: { repeatVisit: true }, d: "Came last week for back pain, tablets se aaram nahi hai abhi bhi", st: "new" },
-  { m: 6, age: 37, forWhom: "family", source: "phone", d: "Khet mein kaam karte waqt bichhu ne kaat liya, bahut dard hai", st: "new" }
+  { m: 44, age: 45, source: "walkin", d: "Mujhe sugar test ki report dikhani hai", st: "new" },
+  { m: 6, age: 37, forWhom: "family", source: "phone", d: "Khet mein kaam karte waqt bichhu ne kaat liya, bahut dard hai", st: "new" },
+  { m: 3, age: 6, forWhom: "family", source: "whatsapp", d: "Bachhe ne galti se keede maarne wali dawai pee li, ulti kar raha hai", st: "new" }
 ];
 
 function seed() {
@@ -77,7 +79,7 @@ function seed() {
     if (s.st === "signposted" || s.st === "closed") {
       push({ at: at + 40000, by: STAFF.desk, action: "signposted", to: r.lane, note: "Told to call 108 now; duty doctor alerted" });
       r.status = s.st;
-      if (s.st === "closed") push({ at: at + 30 * 60000, by: STAFF.desk, action: "closed", to: r.lane, note: "108 confirmed pick-up to CHC Rampur" });
+      if (s.st === "closed") push({ at: at + 30 * 60000, by: STAFF.desk, action: "closed", to: r.lane, note: "108 confirmed pick-up to the nearest 24x7 hospital" });
     } else if (s.st === "raised" || s.st === "lowered") {
       push({ at: dAt, by: STAFF.desk, action: "override", from: r.lane, to: s.to, reason: s.reason });
       r.lane = s.to; r.status = s.to === "ROUTINE" ? "booked" : "accepted";
@@ -104,7 +106,7 @@ function seed() {
     const raised = Math.round(rand() * 2.4);
     days.push({ date: d.setHours(12, 0, 0, 0), total, E, S, R: total - E - S, raised, lowered: Math.round(1 + rand() * 4), guard: Math.round(total * (0.05 + rand() * 0.05)), reviewMedian: Math.round(38 + rand() * 50) });
   }
-  return { version: 4, seededAt: now, seq, requests, log, days, ruleFlags: [], settings: { ai: false, model: "claude-opus-5-5" } };
+  return { version: 5, seededAt: now, seq, requests, log, days, ruleFlags: [], settings: { ai: false, model: "claude-opus-5-5" } };
 }
 
 export function load() {
@@ -114,7 +116,7 @@ export function load() {
     state = raw ? JSON.parse(raw) : null;
   } catch (e) { state = null; }
   // A new day starts a fresh synthetic queue.
-  if (!state || state.version !== 4 || new Date(state.seededAt).toDateString() !== new Date().toDateString()) { state = seed(); save(); }
+  if (!state || state.version !== 5 || new Date(state.seededAt).toDateString() !== new Date().toDateString()) { state = seed(); save(); }
   return state;
 }
 
@@ -187,7 +189,7 @@ export function override(id, to, reason, by = STAFF.desk) {
 export const OUTCOMES = {
   come_today: { label: "Come to OPD today", icon: "walk" },
   tele: { label: "eSanjeevani teleconsult", icon: "web" },
-  refer: { label: "Refer to CHC Rampur (FRU)", icon: "hospital" },
+  refer: { label: "Refer to a higher centre", icon: "hospital" },
   routine: { label: "Routine slot is fine", icon: "calendar" },
   emergency: { label: "Escalate: call 108 now", icon: "ambulance" }
 };
