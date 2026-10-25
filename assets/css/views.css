@@ -495,3 +495,18 @@ details.ref .table-wrap { margin: 0 -20px -16px; }
 @media (max-width: 760px) { .ladder-photos { grid-template-columns: 1fr; } .ladder-photos .photo { aspect-ratio: 16 / 10; } }
 .why-photo { aspect-ratio: 21 / 9; margin-top: 16px; }
 @media (max-width: 600px) { .why-photo { aspect-ratio: 16 / 10; } }
+
+/* AI second opinion panel */
+.ai-panel p { margin: 0; font-size: 13.5px; }
+.ai-act { margin-top: 10px; display: flex; gap: 8px; }
+.ai-out { padding: 12px 14px; border-radius: 12px; background: var(--info-tint); display: grid; gap: 6px; animation: aiIn 220ms var(--ease-out) both; }
+.ai-out.ok { background: var(--rt-tint); }
+.ai-out.up, .ai-out.warn { background: var(--saffron-tint); }
+.ai-out.low { background: var(--bg-sunk); }
+.ai-out.em { background: var(--em-tint); }
+.ai-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13.5px; }
+.ai-out p { color: var(--ink-2); }
+.ai-by { font-size: 12px; }
+.oc.suggest { box-shadow: 0 0 0 2px var(--em), var(--shadow-2); }
+@keyframes aiIn { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .ai-out { animation: none; } }

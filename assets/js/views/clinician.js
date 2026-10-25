@@ -7,6 +7,7 @@ import { OUTCOMES } from "../store.js";
 import { CLINIC } from "../india.js";
 import { ILLUS } from "../illus.js";
 import { headerHtml, bodyHtml, ageText } from "./detail.js";
+import { aiPanelHtml, bindAiPanel } from "./aipanel.js";
 
 export function render(root) {
   let sel = null;
@@ -49,12 +50,13 @@ export function render(root) {
     const el = $("[data-detail]");
     const r = sel && store.get(sel);
     if (!r) { el.innerHTML = `<div class="empty big">${ILLUS.chai()}<b>Nothing to review</b><span class="muted">Same-day requests appear here once the front desk sends them.</span></div>`; return; }
+    const aiEm = r.result.ai && r.result.ai.level === "EMERGENCY";
     el.innerHTML = `
       <div class="cd-head">${headerHtml(r, false)}</div>
-      <div class="cd-body">${bodyHtml(r)}</div>
+      <div class="cd-body">${bodyHtml(r)}${aiPanelHtml(r)}</div>
       <div class="cd-act">
         <span class="label">Outcome</span>
-        <div class="outcomes">${Object.entries(OUTCOMES).map(([k, o]) => `<button class="oc ${k}" data-oc="${k}"><span class="oc-i">${icon(o.icon)}</span><span>${esc(o.label)}</span></button>`).join("")}</div>
+        <div class="outcomes">${Object.entries(OUTCOMES).map(([k, o]) => `<button class="oc ${k} ${aiEm && k === "emergency" ? "suggest" : ""}" data-oc="${k}"><span class="oc-i">${icon(o.icon)}</span><span>${esc(o.label)}</span></button>`).join("")}</div>
         <textarea class="textarea" data-note placeholder="Note (needed if lowering to routine)" style="min-height:56px"></textarea>
         <button class="btn ghost sm" data-flag>${icon("flag")} Rule looks wrong</button>
       </div>`;
@@ -65,6 +67,7 @@ export function render(root) {
       store.review(r.id, k, note || OUTCOMES[k].label);
       toast(`${r.token}: ${OUTCOMES[k].label}`);
     }));
+    bindAiPanel(el, r, paintDetail);
     el.querySelector("[data-flag]").addEventListener("click", () => {
       const note = el.querySelector("[data-note]").value.trim() || "Rule wording looks wrong for this request";
       store.flagRule(r.id, note); toast("Sent to the clinic lead's rule review");

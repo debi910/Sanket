@@ -2,7 +2,7 @@
 // change staff made, which is how rule misses are found.
 import { esc, icon, toast, modal, laneChip, fmtTime, fmtDate, countUp } from "../ui.js";
 import * as store from "../store.js";
-import { getKey, setKey } from "../ai.js";
+import { openSettings } from "./settings.js";
 import * as charts from "../charts.js";
 import { ILLUS } from "../illus.js";
 
@@ -98,27 +98,4 @@ function donut(parts) {
     <div class="donut-leg">${parts.map(([l, v, c]) => `<div><i style="background:${c}"></i>${esc(l)}<b class="num">${v}</b></div>`).join("")}</div></div>`;
 }
 
-export function openSettings() {
-  const st = store.settings();
-  const m = modal(`
-    <h2 style="font-size:20px">Settings</h2>
-    <p class="muted" style="margin:4px 0 18px">These apply to this browser only.</p>
-    <div class="grid" style="gap:16px">
-      <label class="check"><input type="checkbox" data-ai ${st.ai ? "checked" : ""}><span><strong>AI second reader (Claude)</strong><span>Runs after the rules and may only raise a lane. Quotes it gives are kept only if they appear in the request. If it fails, a routine result goes to a person.</span></span></label>
-      <div class="field"><label>Anthropic API key</label><input class="input" type="password" autocomplete="off" data-key value="${esc(getKey())}" placeholder="sk-ant-…"><span class="hint">Kept only in this tab (sessionStorage) and sent only to the Anthropic API. For a real clinic, this call belongs on a server.</span></div>
-      <div class="field"><label>Model</label><select class="input select" data-model>
-        ${["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5"].map((x) => `<option ${x === st.model ? "selected" : ""}>${x}</option>`).join("")}</select></div>
-      <hr class="divider" style="margin:4px 0">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <span class="muted" style="font-size:13px">Reset the synthetic queue and decision log for a fresh demo.</span>
-        <button class="btn" data-reset>${icon("refresh")} Reset demo data</button>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px"><button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-save>Save</button></div>`, { label: "Settings" });
-  m.el.querySelector("[data-save]").addEventListener("click", () => {
-    setKey(m.el.querySelector("[data-key]").value.trim());
-    store.settings({ ai: m.el.querySelector("[data-ai]").checked, model: m.el.querySelector("[data-model]").value });
-    m.close(); toast("Settings saved");
-  });
-  m.el.querySelector("[data-reset]").addEventListener("click", () => { store.reset(); m.close(); toast("Demo data reset"); location.reload(); });
-}
+export { openSettings } from "./settings.js";

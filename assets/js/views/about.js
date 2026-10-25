@@ -1,6 +1,6 @@
 // About: the idea, the safety promises, the Indian data behind the rules, and
 // the reference material (rules, tests, sources) folded away until asked for.
-import { esc, icon, highlight, evidenceGroups, laneChip, fmtNum, countUp } from "../ui.js";
+import { esc, icon, highlight, evidenceGroups, laneChip, LANE, fmtNum, countUp } from "../ui.js";
 import { STATS, SOURCES } from "../india.js";
 import * as charts from "../charts.js";
 import { ILLUS } from "../illus.js";
@@ -64,14 +64,14 @@ export function render(root) {
         ${E.RULES.map((r) => `<tr><td class="num"><b>${esc(r.id)}</b></td><td>${laneChip(r.category)}</td><td><b>${esc(r.title)}</b><div class="muted">${esc(r.reason)}</div></td></tr>`).join("")}
         ${E.HISTORY_RULES.map((r) => `<tr><td class="num"><b>${esc(r.id)}</b></td><td>${laneChip(r.category)}</td><td><b>${esc(r.title)}</b><div class="muted">Past history, raises only. ${esc(r.reason)}</div></td></tr>`).join("")}
         <tr><td class="num"><b>G1</b></td><td><span class="tag saffron">Raises</span></td><td><b>Reassurance guard</b><div class="muted">Phrases removed, request scored again, the more urgent lane kept.</div></td></tr>
-        <tr><td class="num"><b>AI</b></td><td><span class="tag saffron">Raises</span></td><td><b>AI second reader</b><div class="muted">Optional Claude check. May raise a lane; never lowers one.</div></td></tr>
+        <tr><td class="num"><b>AI</b></td><td><span class="tag saffron">Raises</span></td><td><b>AI second reader</b><div class="muted">Optional Gemini or Claude check after the rules, when staff press Ask AI. May raise a lane; never lowers one.</div></td></tr>
       </tbody></table></div>
     </details>
 
     <details class="card more ref" style="margin-top:12px">
       <summary>${icon("check")}Test cases <span class="tag ${pass === rows.length ? "brand" : "em"}">${pass} of ${rows.length} pass</span></summary>
       <div class="table-wrap" style="max-height:480px"><table class="table"><thead><tr><th>ID</th><th>Request</th><th>Expected</th><th>Result</th></tr></thead><tbody>
-        ${rows.map((r) => `<tr><td class="num"><b>${esc(r.id)}</b></td><td>${esc(r.desc)}</td><td>${laneChip(r.expect)}</td><td>${r.pass ? icon("check", "ok") : icon("x", "bad")} ${esc(r.gotRules.join(", "))}</td></tr>`).join("")}
+        ${rows.map((r) => `<tr><td class="num"><b>${esc(r.id)}</b></td><td>${esc(r.desc)}</td><td>${LANE[r.expect] ? laneChip(r.expect) : `<span class="tag">${esc(r.expect)}</span>`}</td><td>${r.pass ? icon("check", "ok") : icon("x", "bad")} ${esc(r.gotRules.join(", "))}</td></tr>`).join("")}
       </tbody></table></div>
     </details>
 

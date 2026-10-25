@@ -379,7 +379,10 @@
     // Only keep phrases that really appear in the request, so the AI cannot invent evidence.
     var phrases = (ai.phrases || []).map(normalise).filter(function (p) { return p && text.indexOf(p) !== -1; }).slice(0, 4);
     var aiCat = ai.level === "EMERGENCY" ? "EMERGENCY" : (ai.level === "SAME_DAY" || ai.unclear) ? "SAME_DAY" : "ROUTINE";
-    var out = Object.assign({}, ruleResult, { ai: { level: aiCat, unclear: !!ai.unclear, phrases: phrases, escalated: false } });
+    // One short line for staff. Trimmed so a long answer cannot flood the screen.
+    var reason = String(ai.reason || "").replace(/\s+/g, " ").trim().slice(0, 160);
+    var out = Object.assign({}, ruleResult, { ai: { level: aiCat, unclear: !!ai.unclear, phrases: phrases, reason: reason, provider: ai.provider || null,
+      escalated: false, lowerIgnored: rankOf(aiCat) < rankOf(ruleResult.category) } });
     if (rankOf(aiCat) > rankOf(ruleResult.category)) {
       var cat = CATEGORIES[aiCat];
       out.category = cat.id; out.label = cat.label; out.action = cat.action;
@@ -403,7 +406,7 @@
       "SAME_DAY if it suggests fever, worsening or persistent symptoms, severe pain, vomiting or loose motions, a wound or animal bite, pregnancy, emotional distress, a medicine problem, or any new bodily symptom.",
       "ROUTINE only for clearly routine or paperwork requests with no symptoms of concern.",
       "Set unclear to true if the request is vague, contradictory, or you cannot tell.",
-      "Reply with only JSON: {\"level\":\"EMERGENCY\"|\"SAME_DAY\"|\"ROUTINE\",\"unclear\":true|false,\"phrases\":[up to 3 short exact quotes from the request that drove the choice]}",
+      "Reply with only JSON: {\"level\":\"EMERGENCY\"|\"SAME_DAY\"|\"ROUTINE\",\"unclear\":true|false,\"phrases\":[up to 3 short exact quotes from the request that drove the choice],\"reason\":\"one short sentence for the front desk, under 20 words, about urgency only, naming no disease\"}",
       "",
       "Patient age: " + (request.age === "" || request.age == null ? "not given" : request.age),
       "Past history given by the patient: " + (historySummary(request).join("; ") || "none given"),
@@ -412,8 +415,21 @@
     ].join("\n");
   }
 
+  /* Reads the model's reply. Accepts plain JSON or JSON inside a ``` fence.
+   * Returns null for anything that is not a usable answer. */
+  function parseAiReply(text) {
+    var t = String(text || "").trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+    var start = t.indexOf("{"), end = t.lastIndexOf("}");
+    if (start === -1 || end <= start) return null;
+    try {
+      var o = JSON.parse(t.slice(start, end + 1));
+      if (!o || ["EMERGENCY", "SAME_DAY", "ROUTINE"].indexOf(o.level) === -1) return null;
+      return { level: o.level, unclear: !!o.unclear, phrases: Array.isArray(o.phrases) ? o.phrases.map(String) : [], reason: typeof o.reason === "string" ? o.reason : "" };
+    } catch (e) { return null; }
+  }
+
   var api = { POLICY_VERSION: POLICY_VERSION, CATEGORIES: CATEGORIES, RULES: RULES, MINIMISERS: MINIMISERS, HISTORY: HISTORY, HISTORY_RULES: HISTORY_RULES, historySummary: historySummary,
-    route: route, combine: combine, aiPrompt: aiPrompt, normalise: normalise, findMinimisers: findMinimisers, stripMinimisers: stripMinimisers };
+    route: route, combine: combine, aiPrompt: aiPrompt, parseAiReply: parseAiReply, normalise: normalise, findMinimisers: findMinimisers, stripMinimisers: stripMinimisers };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.TriageEngine = api;
 })(typeof window !== "undefined" ? window : this);

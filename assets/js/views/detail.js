@@ -47,7 +47,6 @@ export function bodyHtml(r) {
     ? `${icon("ambulance")}<span>Tell them to call <b>108</b> now. Or take them to the nearest 24x7 hospital.</span>`
     : svc ? `${icon("calendar")}<span>${r.lane === "ROUTINE" ? "Booked" : "If routine later"}: <b>${esc(svc.name)}</b>, ${esc(fmtDate(svc.date))} ${esc(svc.time)}</span>` : "";
   const others = (res.otherSignals || []).filter((x) => !res.reasons.some((y) => y.ruleId === x.ruleId));
-  const ai = !res.ai ? "Off (rules only)" : res.ai.failed ? "Failed, so routine was raised to review" : res.ai.escalated ? `Raised the lane to ${LANE[res.ai.level].short}` : `Agreed (${LANE[res.ai.level].short})`;
 
   return `
     <blockquote class="req-text">${highlight(r.description, evidenceGroups(res))}</blockquote>
@@ -55,7 +54,9 @@ export function bodyHtml(r) {
       <h4>Why ${esc(LANE[r.suggestedLane].short.toLowerCase())}</h4>
       <ul class="reasons">${res.reasons.map((x) => `<li><span class="rid ${x.category}">${esc(x.ruleId)}</span><div><b>${esc(x.title)}</b><p>${esc(x.reason)}</p></div></li>`).join("")}</ul>
     </section>
-    ${r.lane !== r.suggestedLane ? `<div class="note">${icon("undo")}<span>Staff changed ${LANE[r.suggestedLane].short.toLowerCase()} to <b>${LANE[r.lane].short.toLowerCase()}</b>.</span></div>` : ""}
+    ${r.lane !== r.suggestedLane ? ((r.history.filter((h) => h.action === "override" || h.action === "escalated").pop() || {}).action === "override"
+      ? `<div class="note">${icon("undo")}<span>Staff changed ${LANE[r.suggestedLane].short.toLowerCase()} to <b>${LANE[r.lane].short.toLowerCase()}</b>.</span></div>`
+      : `<div class="note warm">${icon("spark")}<span>The AI second opinion suggests <b>${LANE[r.suggestedLane].short.toLowerCase()}</b>. Staff decide.</span></div>`) : ""}
     ${g.changed ? `<div class="note warm">${icon("shield")}<span>Family reassurance (<s>${esc(g.phrases[0])}</s>) was ignored. Without it the request is <b>${LANE[g.withoutReassurance].short.toLowerCase()}</b>.</span></div>` : ""}
     ${hist.length ? `<div class="hist-row">${icon("doc")}<span>${hist.map((x) => `<span class="tag">${esc(x)}</span>`).join(" ")}</span></div>` : ""}
     ${next ? `<div class="next-row">${next}</div>` : ""}
@@ -63,7 +64,6 @@ export function bodyHtml(r) {
       <summary>More details</summary>
       ${others.length ? `<p class="label">Other signals</p><ul class="reasons">${others.map((x) => `<li><span class="rid ${x.category}">${esc(x.ruleId)}</span><div><b>${esc(x.title)}</b></div></li>`).join("")}</ul>` : ""}
       ${g.phrases.length && !g.changed ? `<p class="muted">Reassurance found and ignored: ${g.phrases.map((p) => `<s>${esc(p)}</s>`).join(", ")}. Lane unchanged.</p>` : ""}
-      <p class="muted">AI second reader: ${ai}</p>
       <p class="label">Timeline</p>
       <ol class="hist">${r.history.map((h) => `<li><span class="dotl ${h.to || ""}"></span><div><b>${esc(h.by)}</b> ${esc(histText(h))}${h.reason ? ` · “${esc(h.reason)}”` : ""}<span class="muted">${fmtTime(h.at)}</span></div></li>`).join("")}</ol>
     </details>`;
@@ -80,6 +80,7 @@ function histText(h) {
     case "reviewed": return `reviewed: ${OUTCOMES[h.outcome] ? OUTCOMES[h.outcome].label : h.outcome}`;
     case "closed": return "closed the request";
     case "rule-flag": return "flagged the rules";
+    case "ai-checked": return h.note;
     default: return h.action;
   }
 }

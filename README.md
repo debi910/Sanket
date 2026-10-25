@@ -23,7 +23,7 @@ The UI shows only what each person needs; extra detail sits behind "More details
 2. **Past history can only escalate.** Eleven history rules (H1 to H11) combine what the patient tells us (heart disease, blood thinner, chemo or HIV, diabetes or insulin, asthma or COPD, kidney disease, pregnancy, a recent hospital stay, or a repeat visit) with today's text. Each rule needs both. For example, heart disease plus chest discomfort gives emergency guidance, and a blood thinner plus a fall does too. History alone never names a disease and never lowers a lane.
 3. **Indian red flags and wording.** Snakebite, scorpion sting, pesticide, dengue warning signs, heatstroke ("loo lag gayi") and pregnancy danger signs. Patterns cover English and romanised Hinglish. Any other script goes to a person.
 4. **Programme-day booking.** Routine requests go to the clinic day that fits: routine immunisation, the PMSMA antenatal clinic on the 9th of every month, the NCD clinic for BP and sugar, the reports desk or the dressing room.
-5. **The AI can only escalate.** An optional Claude second reader (off by default) may raise a lane or mark text as unclear. It can never lower one, and any quotes it gives that are not in the request are dropped.
+5. **The AI can only escalate.** The rules always decide first. Staff can then press **Ask AI** for a second opinion from Google Gemini or Anthropic Claude. It may raise a lane or mark text as unclear, with a one-line reason. It can never lower one (a lower suggestion is shown as ignored), and any quotes it gives that are not in the request are dropped.
 
 ## Run it
 
@@ -31,12 +31,12 @@ It is a static site with no build step.
 
 ```bash
 python3 -m http.server 8000   # then open http://localhost:8000
-node tests/tests.js           # 45 routing test cases
+node tests/tests.js           # 51 test cases (routing, AI combine, AI reply parsing)
 ```
 
 You can also run the test cases in the browser under **About → Test cases**.
 
-To try the AI check, open **Dashboard → Settings**, switch it on and paste an Anthropic API key. The key stays in that browser tab only (sessionStorage). In a real deployment this call belongs on a server.
+To try the AI second opinion, get a free Gemini key at https://aistudio.google.com/app/apikey (or a Claude key at https://console.anthropic.com/settings/keys), open **Dashboard → Settings**, pick the provider, paste the key and save. Then open a request in **Front desk** or **Doctor** and press **Ask AI**. The key is kept only in that browser's localStorage and sent only to the chosen provider; it is never in this repo. Without a key, or if the call fails, Sanket stays rules-only. In a real deployment this call belongs on a server.
 
 ## Project layout
 
@@ -46,9 +46,11 @@ assets/js/engine.js        routing rules, history rules, framing guard, AI combi
 assets/js/store.js         shared state, synthetic seed queue, decisions log
 assets/js/india.js         public data with sources, referral chain, seasons, programme days
 assets/js/views/*.js       home, patient, desk, clinician, insights, about
-assets/js/ai.js            optional Claude second reader (escalate-only)
+assets/js/ai.js            optional AI second opinion, Gemini or Claude (escalate-only)
+assets/js/views/aipanel.js "Ask AI" panel on Front desk and Doctor
+assets/js/views/settings.js provider, key and model settings
 assets/css/*.css           design system and views
-tests/tests.js             45 test cases (node or browser)
+tests/tests.js             51 test cases (node or browser)
 SAFETY_NOTE.md             safety note
 ```
 
@@ -75,6 +77,6 @@ The queue, requests, decisions and the 14-day trend are synthetic. Seasonal patt
 | English and Hinglish rules, voice input | Hindi, Tamil, Bengali and more; IVR for feature phones |
 | Past history as escalate-only risk modifiers | History from ABHA records, with consent |
 | Framing guard, negation and unclear-text fallbacks | Clinician review of every rule; consented testing on real requests |
-| Optional Claude second reader | Multi-run agreement check; server-side key handling |
+| Optional AI second opinion (Gemini or Claude) | Multi-run agreement check; server-side key handling |
 | Programme-day booking and calendar file | ABDM, eSanjeevani and HMIS integration |
 | Dashboard and CSV export of decisions | Equity audit by age, language and source; CDSCO classification check |

@@ -12,7 +12,7 @@ An administrative sorting aid for the front desk of a community clinic. It sugge
 - Each history rule (H1 to H11) needs a history item and something in today's text, for example heart disease and chest discomfort, or a blood thinner and a fall. History never lowers a lane and never names a condition.
 ## No diagnosis
 - Rules describe what was written ("mentions chest pain"), never what it might be.
-- The AI is asked only for a lane and short quotes from the request. Its free text is never shown, and quotes that don't appear in the request are thrown away.
+- The AI is asked only when staff press Ask AI, after the rules. It returns a lane, short quotes from the request and one short reason line (cut to 160 characters, asked to name no disease). Quotes that don't appear in the request are thrown away, and a lower lane is shown but ignored.
 - The requester only sees "call 108 / 112" or "staff will review your request".
 ## Safe fallback
 - Routine needs positive evidence. Unclear, very short, unsure or unmatched requests go to same-day human review.
@@ -26,7 +26,7 @@ An administrative sorting aid for the front desk of a community clinic. It sugge
 - The tool is meant to be used under a named clinician who owns the policy and reviews the log.
 ## Data and privacy
 - Only made-up requests are used. The demo asks for no phone numbers or ID numbers, in line with data minimisation under India's DPDP Act 2023.
-- Requests are stored only in this browser. The optional AI check sends the request text (with reassurance removed) and age to Claude, with no name.
+- Requests are stored only in this browser. The optional AI check sends the request text (with reassurance removed), age and ticked history to Google Gemini or Anthropic Claude, with no name. The API key is kept only in the browser's localStorage.
 ## Known limits
 - Keyword rules miss unusual wording and spelling. The AI check helps, but neither is validated clinically.
 - Hinglish coverage is a starter list. Other Indian scripts are not read yet; they fall back to a person.

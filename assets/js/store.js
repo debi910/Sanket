@@ -106,7 +106,7 @@ function seed() {
     const raised = Math.round(rand() * 2.4);
     days.push({ date: d.setHours(12, 0, 0, 0), total, E, S, R: total - E - S, raised, lowered: Math.round(1 + rand() * 4), guard: Math.round(total * (0.05 + rand() * 0.05)), reviewMedian: Math.round(38 + rand() * 50) });
   }
-  return { version: 5, seededAt: now, seq, requests, log, days, ruleFlags: [], settings: { ai: false, model: "claude-opus-5-5" } };
+  return { version: 5, seededAt: now, seq, requests, log, days, ruleFlags: [], settings: { ai: false, provider: "gemini", model: "gemini-2.5-flash" } };
 }
 
 export function load() {
@@ -149,8 +149,10 @@ export function applyAi(id, ai, failed) {
   const r = get(id); if (!r) return;
   const combined = E().combine(r.result, ai, r.description, failed);
   r.result = combined;
+  const note = failed ? "AI unavailable; rules result kept" : combined.ai.lowerIgnored ? `AI suggested ${combined.ai.level.toLowerCase().replace("_", "-")}; lower lane ignored` : combined.ai.escalated ? "AI raised the lane" : "AI agreed with the rules";
+  if (!(combined.category !== r.suggestedLane && RANK[combined.category] > RANK[r.suggestedLane])) logIt(r, { by: "AI second opinion", action: "ai-checked", to: r.lane, note });
   if (combined.category !== r.suggestedLane && RANK[combined.category] > RANK[r.suggestedLane]) {
-    r.history.push({ at: Date.now(), by: "AI check", action: "escalated", from: r.suggestedLane, to: combined.category, note: failed ? "AI check failed" : "AI raised the lane" });
+    logIt(r, { by: "AI second opinion", action: "escalated", from: r.suggestedLane, to: combined.category, note: failed ? "AI unavailable, so routine went to review" : "AI raised the lane" });
     r.suggestedLane = combined.category;
     if (r.status === "new") r.lane = combined.category;
     if (r.lane !== "EMERGENCY") r.service = suggestService(r.description, r.lane, r.createdAt);
@@ -223,6 +225,7 @@ export function flagRule(id, note, by = STAFF.mo) {
 
 export function settings(patch) {
   const s = load();
+  if (!s.settings.provider) s.settings.provider = "gemini";
   if (patch) { Object.assign(s.settings, patch); save(); }
   return s.settings;
 }

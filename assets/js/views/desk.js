@@ -2,7 +2,7 @@
 // the suggested lane or change it with a reason. Add phone calls and walk-ins.
 import { esc, icon, toast, drawer, modal, segmented, laneChip, LANE, waitText } from "../ui.js";
 import * as store from "../store.js";
-import { aiCheck } from "../ai.js";
+import { aiPanelHtml, bindAiPanel } from "./aipanel.js";
 import { CLINIC } from "../india.js";
 import { ILLUS } from "../illus.js";
 import { headerHtml, bodyHtml, SOURCE, statusTag, ageText } from "./detail.js";
@@ -73,7 +73,7 @@ export function render(root) {
     const canAct = r.status === "new";
     const d = drawer(`
       <div class="drawer-head">${headerHtml(r)}</div>
-      <div class="drawer-body">${bodyHtml(r)}
+      <div class="drawer-body">${bodyHtml(r)}${r.result.category !== "EMERGENCY" || r.result.ai ? aiPanelHtml(r) : ""}
         <section class="sect change" hidden>
           <h4>Change lane</h4>
           <div class="seg" data-to>${["EMERGENCY", "SAME_DAY", "ROUTINE"].map((l) => `<button data-value="${l}" aria-pressed="${l === r.lane}">${LANE[l].short}</button>`).join("")}</div>
@@ -85,7 +85,6 @@ export function render(root) {
       <div class="drawer-foot">
         ${canAct ? `<button class="btn ${r.lane === "EMERGENCY" ? "danger" : "primary"}" data-accept>${icon("check")} ${acceptLabel}</button>` : ""}
         ${r.status !== "closed" ? `<button class="btn" data-change>Change lane</button>` : ""}
-        ${store.settings().ai && !r.result.ai ? `<button class="btn ghost" data-ai>${icon("spark")} AI check</button>` : ""}
       </div>`, { label: "Request " + r.token, onClose: () => { openId = null; } });
     const el = d.el;
     const done = (msg) => { toast(msg); d.close(); };
@@ -93,13 +92,7 @@ export function render(root) {
       store.accept(id);
       done({ EMERGENCY: `${r.token}: 108 advice logged`, SAME_DAY: `${r.token} sent to the doctor`, ROUTINE: `${r.token} booked` }[r.lane]);
     });
-    el.querySelector("[data-ai]")?.addEventListener("click", async (e) => {
-      const b = e.currentTarget; b.disabled = true; b.innerHTML = `<span class="spinner"></span> Checking`;
-      const { ai, failed, skipped } = await aiCheck(r, r.result, store.settings().model);
-      if (skipped) { toast("Add an API key in Settings first", "info"); b.disabled = false; b.innerHTML = `${icon("spark")} AI check`; return; }
-      store.applyAi(id, ai, failed);
-      d.close(); setTimeout(() => open(id), 260);
-    });
+    bindAiPanel(el, r, () => { d.close(); setTimeout(() => open(id), 260); });
     const ch = el.querySelector(".change");
     let to = r.lane;
     const paintReasons = () => {

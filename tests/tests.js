@@ -66,7 +66,17 @@
     { id: "C2", desc: "AI raises a routine request it finds concerning", text: "Need a checkup, also my left arm feels heavy and numb", ai: { level: "EMERGENCY", unclear: false, phrases: ["left arm feels heavy and numb"] }, expect: "EMERGENCY" },
     { id: "C3", desc: "AI unsure about a routine request", text: "Need a checkup for something", ai: { level: "ROUTINE", unclear: true, phrases: [] }, expect: "SAME_DAY" },
     { id: "C4", desc: "AI call fails on a routine request", text: "Need my BP check next week", ai: null, aiFailed: true, expect: "SAME_DAY" },
-    { id: "C5", desc: "AI invents a phrase that is not in the text", text: "Need a vaccination booster dose next month", ai: { level: "SAME_DAY", unclear: false, phrases: ["severe bleeding"] }, expect: "SAME_DAY", noPhrases: true }
+    { id: "C5", desc: "AI invents a phrase that is not in the text", text: "Need a vaccination booster dose next month", ai: { level: "SAME_DAY", unclear: false, phrases: ["severe bleeding"] }, expect: "SAME_DAY", noPhrases: true },
+    { id: "C6", desc: "AI suggests a lower lane; it is ignored and flagged", text: "3 din se bukhar hai aur sir dard", ai: { level: "ROUTINE", unclear: false, phrases: [], reason: "Sounds mild" }, expect: "SAME_DAY", lowerIgnored: true },
+    { id: "C7", desc: "AI one-line reason is kept for staff, trimmed to 160 characters", text: "Need a checkup, also my left arm feels heavy and numb", ai: { level: "EMERGENCY", unclear: false, phrases: [], reason: new Array(60).join("arm numbness ") }, expect: "EMERGENCY", maxReason: 160 }
+  ];
+
+  // Checks for reading the model's reply: bad or missing answers must count as a failure.
+  var PARSE_CASES = [
+    { id: "P1", desc: "Plain JSON reply", text: '{"level":"SAME_DAY","unclear":false,"phrases":["bukhar"],"reason":"Fever for 3 days needs a call today."}', expect: "SAME_DAY" },
+    { id: "P2", desc: "JSON inside a code fence", text: '```json\n{"level":"EMERGENCY","unclear":false,"phrases":[],"reason":"Chest symptoms."}\n```', expect: "EMERGENCY" },
+    { id: "P3", desc: "Unknown lane is rejected", text: '{"level":"LOW","unclear":false,"phrases":[]}', expect: null },
+    { id: "P4", desc: "Not JSON at all is rejected", text: "I think this patient is fine.", expect: null }
   ];
 
   function run(engine) {
@@ -79,13 +89,18 @@
     COMBINE_CASES.forEach(function (c) {
       var base = engine.route({ description: c.text, age: 40 });
       var r = engine.combine(base, c.ai, c.text, !!c.aiFailed);
-      var pass = r.category === c.expect && (!c.noPhrases || (r.ai && r.ai.phrases.length === 0));
+      var pass = r.category === c.expect && (!c.noPhrases || (r.ai && r.ai.phrases.length === 0))
+        && (!c.lowerIgnored || (r.ai && r.ai.lowerIgnored === true)) && (!c.maxReason || (r.ai && r.ai.reason.length > 0 && r.ai.reason.length <= c.maxReason));
       rows.push({ id: c.id, group: "AI safety", desc: c.desc + ": \"" + c.text + "\"", expect: c.expect, got: r.category, gotRules: r.reasons.map(function (x) { return x.ruleId; }), pass: pass });
+    });
+    PARSE_CASES.forEach(function (c) {
+      var p = engine.parseAiReply(c.text), got = p ? p.level : null;
+      rows.push({ id: c.id, group: "AI reply", desc: c.desc, expect: c.expect || "rejected", got: got || "rejected", gotRules: [got || "rejected"], pass: got === c.expect });
     });
     return rows;
   }
 
-  var api = { CASES: CASES, COMBINE_CASES: COMBINE_CASES, run: run };
+  var api = { CASES: CASES, COMBINE_CASES: COMBINE_CASES, PARSE_CASES: PARSE_CASES, run: run };
   if (typeof module !== "undefined" && module.exports) {
     module.exports = api;
     if (require.main === module) {

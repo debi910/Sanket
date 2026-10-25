@@ -121,7 +121,7 @@ export function render(root) {
       show(4);
       // Optional AI second reader, only when staff have switched it on. It can only raise the lane.
       if (store.settings().ai && current.lane !== "EMERGENCY") {
-        const { ai, failed, skipped } = await aiCheck(current, current.result, store.settings().model);
+        const { ai, failed, skipped } = await aiCheck(current, current.result, store.settings());
         if (!skipped) {
           const updated = store.applyAi(current.id, ai, failed);
           if (updated && updated.lane !== current.lane) { current = updated; show(4); }
